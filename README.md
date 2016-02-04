@@ -1,4 +1,5 @@
 optimizing slot shift using SIMSO simulator
+
 SLOT SHIFTING : 
 Static scheduling has been shown to be appropriate for a variety of hard real-time systems, mainly due to the verifiable timing behavior of the system and the complex task models supported.
 Its application is, however, impeded in systems with changing operational modes and critical activities, that arrive infrequently with unknown occurrence times. This thesis presents an approach to overcome these shortcomings. It addresses static scheduling, illustrated by an algorithm serving as case study, and provides concepts to extend the scope of statically scheduled systems to deal with mode changes properly and to provide for efficient handling of dynamic activities.
