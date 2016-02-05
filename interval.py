@@ -1,6 +1,7 @@
 
 from simso.core import Scheduler
 from list import locallist
+from ss_task import task_data
 
 class deferred_update:
 	def __init__(self):
@@ -15,12 +16,16 @@ class interval_node:
 		self.start = start
 		self.end = end
 		self.sc = sc
+	@property
 	def id(self):
 		return self.intr_id
+	@property
 	def start(self):
 		return self.start
+	@property
 	def end(self):
 		return self.end
+	@property
 	def sc(self):
 		return self.sc
 	def set_sc(self, val):
@@ -59,16 +64,18 @@ class interval(object):
 
 	def goto_prev_interval(self, data_type):
 		"""
-		Moves interval to previous interval
+		Moves interval to previous interval from curr_point
+		data_type: could be used to return list data or interval itself
 		"""
 		if self.curr_point == None:
 			self.curr_point = self.intr_list.get_prev(None)
 		else:
-			self.curr_point = self.intr_list.get_prev(None)
+			self.curr_point = self.intr_list.get_prev(self.curr_point)
 			if self.curr_point == self.intr_list.get_head():
 				return None
-		return intr.intr_list.get_data(self.curr_point)
-
+		return self.intr_list.get_data(self.curr_point)
+	
+	@property
 	def reset_iterator(self):
 		"""
 		Resets the iterator 
@@ -92,19 +99,19 @@ class interval(object):
 		"""
 		Original update_sc
 		"""
-		tmp = task_data.curr_intr()
-		sc = self.curr_interval.sc()
+		tmp = task_data.curr_intr
+		sc = self.curr_interval.sc
 		self.curr_interval.set_sc(sc-1)
 		while 1:
-			if 1 == task_data.tsk_type(): #softAper
+			if 2 == task_data.tsk_type: 		#softAper
 				break
 			intr = tmp.get_data()
 			intr.set_sc(intr.sc()+1)
-			if intr.id() == self.curr_interval.id():
+			if intr.id == self.curr_interval.id:	#task belongs to same interval
 				break
-			if intr.sc() >= 0:
+			if intr.sc >= 0:			#task interval is +ve just leave
 				break
-			tmp = self.intr_list.go_prev(tmp)
+			tmp = self.intr_list.go_prev(tmp)	#else keep iterating backwards
 
 	def split_intr(self, intr, split_point):
 		pass
@@ -127,6 +134,9 @@ class deferred_interval(interval):
 		super(deferred_interval, self).__init__()
 		print "creating deferred interval"
 
+	"""
+	This should be moved to association class.
+	"""
 	def create_relation_window(self):
 		"""
 		This will create realtion window
@@ -149,9 +159,10 @@ class deferred_interval(interval):
 		This is where defereed update happens
 		"""
 		pass
-
+"""
 i = deferred_interval()
 i.add_interval(1, 1, 1, 1)
 i.add_interval(2,2,3,1)
 
 i.create_relation_window()
+"""
