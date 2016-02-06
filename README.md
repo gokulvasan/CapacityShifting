@@ -16,3 +16,8 @@ in a distributed environment, but This is a overhead on a system.
 
 Capacity Shifting is a methodical approach to remove slots but still provide the flexibility and guarantee provided by slot shifting.
 
+SIMSO Modification: 
+slot shifting needs a seperate data structure called interval which needs to be associated with job of the task.
+To make this happen simso itself needs modification to adapt to different DS.
+In this implementation I will try to make this modification as generic as possible so that the modification
+can be used for other schedulers as well. 
