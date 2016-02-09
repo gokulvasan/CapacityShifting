@@ -1,0 +1,79 @@
+/* This job set file has been automatically created with Task Set Generator v. 1 */
+/* Generation time is: 2014-11-13.14:02:29 */
+/* This is task set 0 */
+
+
+/* --------  Settings Start  -------- */
+/* Method: Smart UUnifast		*/
+/* Output File Name Base: output	*/
+/* Output File Path: newconfig		*/
+/* Number of Task Sets: 20			*/
+/* Min Hyper Period: 100			*/
+/* Max Hyper Period: 300			*/
+/* Number of Cores: 2				*/
+/* Allowed Error: 0.01				*/
+/* Inner Loop Iterations: 20				*/
+/* Deadline Extension Factor (0 if not set): 5				*/
+/* -- Offline Task Settings -- */
+/* Core 1: target_utilization = 0.9 min_wcet = 1 max_wcet = 15 min_period = 15 max_period = 30 */
+/* Core 2: target_utilization = 0.9 min_wcet = 1 max_wcet = 15 min_period = 15 max_period = 30 */
+/* -- Aperiodic Task Settings -- */
+/* Core 1: target_utilization = 0 min_est = 0 max_est = 0 min_wcet = 10 max_wcet = 15 min_dl = 10 max_dl = 15 */
+/* Core 2: target_utilization = 0 min_est = 0 max_est = 0 min_wcet = 10 max_wcet = 15 min_dl = 10 max_dl = 15 */
+/* --------  Settings End  -------- */
+
+
+
+/* -------- Utilization Results Start -------- */
+/* Utilization on core 1 is created by offline guaranteed jobs: 89.1892 %	*/
+/* Utilization on core 2 is created by offline guaranteed jobs: 89.6396 %	*/
+/* Utilization on core 1 is created by aperiodic jobs         : 0 %	*/
+/* Utilization on core 2 is created by aperiodic jobs         : 0 %	*/
+/* Total utilization on core 1                                 : 89.1892 %	*/
+/* Total utilization on core 2                                 : 89.6396 %	*/
+/* -------- Utilization Results End -------- */
+
+
+LCM:222;
+Cores:2;
+Jobs:29;
+/* Offline guaranteed jobs on core 1: 18 */
+/* Offline guaranteed jobs on core 2: 19 */
+/* Aperiodic jobs on core 1: 0 */
+/* Aperiodic jobs on core 2: 0 */
+/* Syntax: Job: ID,core,releaseTime,WCET,deadline,(NULL for periodic, 2 for aperiodic) */
+/*                                           */
+/* --- core 1 - offline guaranteed jobs --- */
+Job:0,1,0,15,22;
+Job:1,1,22,15,44;
+Job:2,1,44,15,66;
+Job:3,1,66,15,88;
+Job:4,1,88,15,110;
+Job:5,1,110,15,132;
+Job:6,1,132,15,154;
+Job:7,1,154,15,176;
+Job:8,1,176,15,198;
+Job:9,1,198,15,220;
+Job:10,1,0,6,27;
+Job:11,1,27,6,54;
+Job:12,1,54,6,81;
+Job:13,1,81,6,108;
+Job:14,1,108,6,135;
+Job:15,1,135,6,162;
+Job:16,1,162,6,189;
+Job:17,1,189,6,216;
+/*                                           */
+/* --- core 2 - offline guaranteed jobs --- */
+Job:18,2,0,13,20;
+Job:19,2,20,13,40;
+Job:20,2,40,13,60;
+Job:21,2,60,13,80;
+Job:22,2,80,13,100;
+Job:23,2,100,13,120;
+Job:24,2,120,13,140;
+Job:25,2,140,13,160;
+Job:26,2,160,13,180;
+Job:27,2,180,13,200;
+Job:28,2,200,13,220;
+/* ---  no aperiodic jobs --- */
+

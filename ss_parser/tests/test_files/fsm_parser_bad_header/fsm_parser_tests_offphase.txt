@@ -1,0 +1,76 @@
+/* This job set file has been automatically created with Task Set Generator v. 1 */
+/* Generation time is: 2014-11-13.14:02:29 */
+/* This is task set 1 */
+
+
+/* --------  Settings Start  -------- */
+/* Method: Smart UUnifast		*/
+/* Output File Name Base: output	*/
+/* Output File Path: newconfig		*/
+/* Number of Task Sets: 20			*/
+/* Min Hyper Period: 100			*/
+/* Max Hyper Period: 300			*/
+/* Number of Cores: 2				*/
+/* Allowed Error: 0.01				*/
+/* Inner Loop Iterations: 20				*/
+/* Deadline Extension Factor (0 if not set): 5				*/
+/* -- Offline Task Settings -- */
+/* Core 1: target_utilization = 0.9 min_wcet = 1 max_wcet = 15 min_period = 15 max_period = 30 */
+/* Core 2: target_utilization = 0.9 min_wcet = 1 max_wcet = 15 min_period = 15 max_period = 30 */
+/* -- Aperiodic Task Settings -- */
+/* Core 1: target_utilization = 0 min_est = 0 max_est = 0 min_wcet = 10 max_wcet = 15 min_dl = 10 max_dl = 15 */
+/* Core 2: target_utilization = 0 min_est = 0 max_est = 0 min_wcet = 10 max_wcet = 15 min_dl = 10 max_dl = 15 */
+/* --------  Settings End  -------- */
+
+
+
+/* -------- Utilization Results Start -------- */
+/* Utilization on core 1 is created by offline guaranteed jobs: 90.2098 %	*/
+/* Utilization on core 2 is created by offline guaranteed jobs: 89.1608 %	*/
+/* Utilization on core 1 is created by aperiodic jobs         : 0 %	*/
+/* Utilization on core 2 is created by aperiodic jobs         : 0 %	*/
+/* Total utilization on core 1                                 : 90.2098 %	*/
+/* Total utilization on core 2                                 : 89.1608 %	*/
+/* -------- Utilization Results End -------- */
+
+
+LCM:286;
+Cores:1;
+Jobs:30;
+/* Offline guaranteed jobs on core 1: 30 */
+/* Offline guaranteed jobs on core 2: 24 */
+/* Aperiodic jobs on core 1: 0 */
+/* Aperiodic jobs on core 2: 0 */
+/* Syntax: Job: ID,core,releaseTime,WCET,deadline,(NULL for periodic, 2 for aperiodic) */
+/*                                           */
+/* --- core 1 - offline guaranteed jobs --- */
+Job:0,1,0,13,15;
+Job:1,1,15,13,30;
+Job:2,1,30,13,45;
+Job:3,1,45,13,60;
+Job:4,1,60,13,75;
+Job:5,1,75,13,90;
+Job:6,1,90,13,105;
+Job:7,1,105,13,120;
+Job:8,1,120,13,135;
+Job:9,1,135,13,150;
+Job:10,1,150,13,165;
+Job:11,1,165,13,180;
+Job:12,1,180,13,195;
+Job:13,1,195,13,210;
+Job:14,1,210,13,225;
+Job:15,1,225,13,240;
+Job:16,1,240,13,255;
+Job:17,1,255,13,270;
+Job:18,1,270,13,285;
+Job:19,1,0,1,25;
+Job:20,1,25,1,50;
+Job:21,1,50,1,75;
+Job:22,1,75,1,100;
+Job:23,1,100,1,125;
+Job:24,1,125,1,150;
+Job:25,1,150,1,175;
+Job:26,1,175,1,200;
+Job:27,1,200,1,225;
+Job:28,1,225,1,250;
+Job:29,1,250,1,275;

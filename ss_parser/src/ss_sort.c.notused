@@ -1,0 +1,172 @@
+#include "ss_data.h"
+
+#define MAX_DEPTH 1024
+
+
+typedef struct _sort_attribute {
+	int (*cmp)(void *a, void *b);
+	void (*swp)(void *a, void *b);
+	void* (*data)(unsigned long index);
+	unsigned long total_count;
+	void *data // place holder for data but should not be
+			// handled directly. 
+}sort_attr;
+
+
+typedef struct _stack {
+
+	void (*init)(void);
+	int (*push)(unsigned long left, unsigned long right);
+	int (*pop)(unsigned long *left, unsigned long *right);
+
+	signed int top;
+	struct _data {
+		long left;
+		long right;
+	}data[MAX_DEPTH];
+
+}stak;
+
+int push(unsigned long left, unsigned long right);
+int pop(unsigned long *left, unsigned long *right);
+
+stak stack;
+ 
+void init(void) {
+	stack.top = -1;
+	memset(stack.data, 0x00, sizeof(stack.data));
+	stack.push = push;
+	stack.pop = pop;
+}
+
+int push(unsigned long left, 
+	unsigned long right ) {
+	
+	stack.top++;
+	if(stack.top > MAX_DEPTH)
+		return -1;
+
+	stack.data[stack.top].left = left;
+	stack.data[stack.top].right = right;
+	return 0;	
+}
+
+
+int pop(unsigned long *left, 
+	unsigned long *right) {
+
+	stack.top--;
+	if(stack.top < 0)
+		return -1;
+
+	*left = stack.data[stack.top].left;
+	*right = stack.data[stack.top].right;
+	return 0;	
+}
+
+
+unsigned long qsort_partition(unsigned long first,
+			      unsigned long last,sort_attr *sort) {
+
+	unsigned long  pivot,left,right,pvd1,pvd2;
+	int cmp_result;
+			
+	/* finding median:  taken little more effort to avoid unecessary computaion*/
+	/*APPROACH : Finding median sedgewick way, median of median, first and last. 
+	*/
+	
+	cmp_result = sort->cmp(sort->data(first),sort->data((first+last)/2) );
+        if (0 > cmp_result) {
+		pvd1=first;
+		pvd2=(first+last)/2;
+        }
+        else {			
+                pvd2=first;
+                pvd1=(first+last)/2;
+        }
+	cmp_result = sort->cmp(sort->data(last),sort->data(pvd1));
+        if ( 0 >= cmp_result)
+        	pivot =pvd1;
+        else
+        {
+        	cmp_result = sort->cmp(sort->data(last),sort->data(pvd2));
+		if ( 0 >= cmp_result )
+                	pivot =last;
+        	else
+                	pivot =pvd2;
+        }
+        sort->swp(sort->data(pivot),sort->data(first));						
+        pivot = first;
+        left=first;                                 
+        right=last+1;								 
+		
+	while (left<right) 
+	{
+		do{                             
+			right--;
+			cmp_result = sort->cmp(sort->data(right), sort->data(pivot) );
+		} while (cmp_result > 0 ); 
+			
+		do{ 
+			left++; 
+			cmp_result = sort->cmp(sort->data(left), sort->data(pivot) );
+		} while ( cmp_result < 0);
+			
+		sort->swp(sort->data(left), sort->data(right) ); //swap
+	}	
+	sort->swp(sort->data(left), sort->data(right) );  
+
+        sort->swp(sort->data(first),sort->data(right) ); 
+                                                
+        return right;
+}
+
+short quick_sort(sort_attr *s ) {
+
+	unsigned long splitpoint, first, last;
+
+	stack.push(0,(total_count-1));
+
+    	while (stack.top != -1)
+        {
+		sort_stack_pop(&first,&last);
+
+        	while(1) {
+			if (last-first > SMALLSIZE) {
+
+				splitpoint = qsort_partition(first,last,sort_attr);
+
+				if (last-splitpoint<splitpoint-first) {
+					stack.push(first,splitpoint-1);
+					first=splitpoint+1;
+				}
+				else {
+					stack.push(splitpoint+1,last);
+					last=splitpoint-1;
+				}
+			}
+			else {
+				insertion_sort(first,last,sort_getData,compare_func,sort_list);
+				break;
+			}
+		}
+
+	return 0;
+		
+}
+
+int sort_main(sort_attr *data_object) {
+
+	/*
+	 * Trying to make the fn independent
+	 */
+	if(!data_object ) {
+		return -1;
+	}
+	
+	if(quick_sort(data_object) ) {
+		return -1;
+	}
+
+	return 0;
+}

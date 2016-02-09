@@ -1,0 +1,80 @@
+Test File Description
+
+FSM Parser tests
+================
+
+Testing headers
+---------------
+
+Each test file was produced by the offline_stage, and then manually changed for
+a given purpose (e.g., had a header removed). The same input was always used.
+This input can be found in file `fsm_parser_tests_offphase.txt`.
+
+The command line used to create these files was:
+
+	./prep.x fsm_parser_tests_offphase.txt testfile litmus
+
+`testfile` was then modified and renamed according to what it tested.
+
+A description of each test file follows. They are stored in:
+
+	`test_files/fsm_parser_bad_header`
+
+
+### data_separator_removed
+
+A test file that is right, only without any of the data separators.
+
+Specifically, 7 bytes were removed:
+  * 1 byte for the character '!'
+  * 4 bytes for the data separator (e.g., "02 D8 00 00" for INTERVAL_START).
+  * 2 bytes of carriage return ('\n') and line feed ('\r')
+
+
+### exclamation_removed
+
+A test file that is right, only without one of the exclamation marks that have
+to precede each data separator. Only one byte is missing (the exclamation mark
+indicated in the file name).
+
+
+### car_return_removed
+
+A test file that is right, only without one of the carriage returns that must
+follow each data separator.
+
+
+### line_feed_removed
+
+A test file that is right, only without one of the line feeds that must follow
+each data separator.
+
+
+### new_line_removed
+
+A test file that is right, only both the carriage return and the line feed were
+removed.
+
+
+Testing fields
+--------------
+
+For now, it is impossible to predict what kinds of errors will appear with the
+fields. What we do here is test three files that are expected to be right.
+Again, each one of the test files was generated with the offline_stage. The
+original files used as input to the offline_stage to generate the test files is
+also available in the same folder, with the string "_orig.txt" appended to its
+name.
+
+To generate each one of the files, the following command line was used:
+
+	./prep.x <testfile>_orig.txt <testfile> litmus
+
+Roughly, the main characteristics of the files are given in their file names:
+
+  * 1 task, 1 core, no binaries
+  * 2 tasks, 1 core, 2 binaries
+  * 3 tasks, 2 cores, no binaries
+
+
+
