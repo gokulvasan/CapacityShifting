@@ -14,30 +14,10 @@
 #include "ss_data.h"
 #include <assert.h>
 
-
-void ss_tsaheylu_init(struct ss_tsaheylu *tsa, struct ss_inject *inj)
-{
-	/* This function expects i to be already allocated */
-	if (!tsa)
-		return;
-
-	tsa->job_to_task = ss_tsa_job_to_task;
-	tsa->intr_task_bond = ss_tsa_intr_task_bond;
-
-	if (inj) {
-		tsa->inj = inj;
-	} else {
-		tsa->inj = malloc(sizeof(struct ss_inject));
-		ss_inject_init(tsa->inj);
-	}
-}
-
 void ss_tsaheylu_del(struct ss_tsaheylu *t)
 {
 	if (!t)
 		return;
-	ss_inject_del(t->inj);
-	free(t->inj);
 }
 
 void clean_intr(struct ss_container *intr)
@@ -694,3 +674,18 @@ int ss_tsa_intr_task_bond(
 	return ret;
 }
 
+int ss_tsaheylu_init(struct ss_tsaheylu *tsa, struct ss_inject *inj)
+{
+	/* This function expects i to be already allocated */
+	if (!tsa)
+		return -1;
+
+	tsa->job_to_task = ss_tsa_job_to_task;
+	tsa->intr_task_bond = ss_tsa_intr_task_bond;
+
+	if (inj) {
+		tsa->inj = inj;
+		return -1;
+	}
+	return 0;
+}

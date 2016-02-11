@@ -14,29 +14,24 @@ int main (int argc, char *argv[])
 	/* Reads command line, as well as .conf file */
 	struct ss_data *inject_data;
 	struct hp_header *header;
+
 	struct ss_inject ss_inject, *inj = &ss_inject;
 	struct ss_tsaheylu ss_tsa, *tsa = &ss_tsa;
+
 	int ret = -1;
-	// pid_t wpid;
-	// int status;
-	// int count;
-	lt_t res_len;
 	enum task_type task= TYPE_END;
-	// int sleep_cnt = 0;
 	int opt;
 	int no_release = 0;
 	int release = 0;
+	void *platform_data = NULL;
 
 	/* Initializes injection data structures */
 	ss_inject_init(inj);
-	ss_tsaheylu_init(tsa, inj);
-
+	if(!ss_tsaheylu_init(tsa, inj)) {
+		fprintf(stderr, "Error: tsaheylu init failed\n");
+		return -1;
+	}
 	do {
-		/*if(argc <= 2 || argc > 3) {
-			fprintf(stderr, "ERROR:argc\n");
-			break;
-		} */
-
 		while((opt = getopt(argc, argv, OPTSTR)) != -1) {
 			switch(opt) {
 			case 'p':
@@ -53,7 +48,7 @@ int main (int argc, char *argv[])
 				no_release = 1;
 			break;
 			case 'r':
-				inj->wait_till_release(inj);
+				inj->plat->run(inj->plat);
 				release = 1;
 			break;
 			default:
@@ -77,20 +72,8 @@ int main (int argc, char *argv[])
 				__FUNCTION__);
 			break;
 		}
-		if(TYPE_PERIODIC == task) {
-			header = inject_data->res_data->data;
-			if(!header->slot_quantum) {
-				fprintf(stderr, "ERROR:%s: Slot quantum is 0\n",
-			 	__FUNCTION__);
-				break;
-			}
-			res_len = header->slot_count * header->slot_quantum;
-			if(res_len <= 0) {
-				fprintf(stderr, "Error %s: reservation len should be <0\n",
-				__FUNCTION__);
-				break;
-			}
-		}
+#if 0
+		/* This need to become platform configuration init*/
 		inj->set_res_id(inj, 1234);
 
 		if(inj->res_create(inj, res_len, 0, task, header) ) {
@@ -98,8 +81,13 @@ int main (int argc, char *argv[])
 			__FUNCTION__);
 			break;
 		}
+#else
+		 inj->plat->parse_data(inj->plat, task, inject_data->res_data->data, platform_data);
+		 inj->plat->configure(inj->plat, task, inject_data->res_data->data);
+#endif
+		/*TSAHEYLU */
 		if(tsa->job_to_task(tsa, &inject_data->task, header, task)) {
-			//TODO: kill all child here.
+			inj->plat->exit(inj->plat);
 			fprintf(stderr, "ERROR %s: task bonding failed\n",
 				__FUNCTION__);
 			break;
@@ -115,8 +103,9 @@ int main (int argc, char *argv[])
 				 __FUNCTION__);
 			break;
 		}
+
 		if(!no_release) {
-			inj->wait_till_release(inj);
+			inj->plat->run(inj->plat);
 		}
 		printf("INJECTION_SUCCESS\n");
 		ret = 0;
