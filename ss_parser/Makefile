@@ -8,20 +8,20 @@ LDFLAGS=
 #OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=ss_parser
 TESTS=tests
-
+PLAT=litmus
 #OBJ=$(join $(addsuffix ../obj/, $(dir $(SOURCE))), $(notdir $(SOURCE:.cpp=.o))) 
-vpath %.c src/
-OBJECTS = $(patsubst src/%.c,%.o,$(wildcard src/*.c))
+vpath %.c ./src/:./src/arch
+#OBJECTS= $(pathsubst %.c,%.o,)
+OBJECTS = $(patsubst (notdir %.c),%.o,$(wildcard src/*.c src/platform/$(PLAT)/*.c))
 
 all:  $(EXECUTABLE) 
 # $(TESTS)
 
 #$(TESTS): $(OBJECTS)
 #	$(MAKE) -C ./tests/
-	
+
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(CFLAGS) $(OBJECTS) -o bin/$@
-
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@

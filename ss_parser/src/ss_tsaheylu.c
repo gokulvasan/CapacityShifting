@@ -189,7 +189,7 @@ static int create_ss_task(struct task *t_task,
 	}
 
 #ifdef DEBUG
-	printf("%s: task offset: %ld\n",
+	printf("%s: task offset: %d\n",
 		 __FUNCTION__, SS_TASK_OFFSET(job_count));
 #endif
 	return SS_TASK_OFFSET(job_count);
@@ -241,7 +241,7 @@ static int create_minor_id_bond( struct ss_task *t_task,
 		return 0;
 	}
 #ifdef DEBUG
-	printf("%s: minor_id[%d]->ends:%ld\n",
+	printf("%s: minor_id[%d]->ends:%d\n",
 			__FUNCTION__,j->jid, (offset + (sizeof(struct minor_id_bond) +
 					(sizeof(struct job_bond) * (i - 1)))) );
 #endif
@@ -326,12 +326,12 @@ struct task *task_init(unsigned int major_id, unsigned int intr_count)
 	memset(t_task, 0x00, sizeof(struct task));
 
 #ifdef DEBUG
-	printf(" task_length: %ld\n", TASK_LENGTH(major_id, intr_count));
+	printf(" task_length: %d\n", TASK_LENGTH(major_id, intr_count));
 #endif
 
 	t_task->ss_tsk = malloc(TASK_LENGTH(major_id, intr_count));
 	if (!t_task->ss_tsk){
-		fprintf(stderr,"Error: %s: ss_tsk malloc fail len:%ld\n",
+		fprintf(stderr,"Error: %s: ss_tsk malloc fail len:%d\n",
 		__FUNCTION__, TASK_LENGTH(major_id, intr_count));
 
 		return NULL;
@@ -626,7 +626,7 @@ int ss_tsa_intr_task_bond(
 
 		intr_inj = malloc(INTR_INJ_SIZE(tsk_cnt) );
 		if(!intr_inj) {
-			fprintf(stderr, "Error:%s(): malloc fail(size:%ld) intr_id:%d\n",
+			fprintf(stderr, "Error:%s(): malloc fail(size:%d) intr_id:%d\n",
 				__FUNCTION__, INTR_INJ_SIZE(tsk_cnt), intr_e->intr_id);
 			ret = -1;
 			break;

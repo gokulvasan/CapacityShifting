@@ -13,7 +13,6 @@ int main (int argc, char *argv[])
 {
 	/* Reads command line, as well as .conf file */
 	struct ss_data *inject_data;
-	struct hp_header *header;
 
 	struct ss_inject ss_inject, *inj = &ss_inject;
 	struct ss_tsaheylu ss_tsa, *tsa = &ss_tsa;
@@ -86,8 +85,8 @@ int main (int argc, char *argv[])
 		 inj->plat->configure(inj->plat, task, inject_data->res_data->data);
 #endif
 		/*TSAHEYLU */
-		if(tsa->job_to_task(tsa, &inject_data->task, header, task)) {
-			inj->plat->exit(inj->plat);
+		if(tsa->job_to_task(tsa, &inject_data->task, inject_data->res_data->data, task)) {
+			inj->plat->exit(inj->plat, 1);
 			fprintf(stderr, "ERROR %s: task bonding failed\n",
 				__FUNCTION__);
 			break;
@@ -108,6 +107,7 @@ int main (int argc, char *argv[])
 			inj->plat->run(inj->plat);
 		}
 		printf("INJECTION_SUCCESS\n");
+		inj->plat->exit(inj->plat, 0);
 		ret = 0;
 
 	} while(0);

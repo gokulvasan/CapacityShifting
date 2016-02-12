@@ -148,12 +148,14 @@ typedef void (*ss_inj_set_res_id_t) (
 
 typedef int (*ss_inj_get_res_id_t)(struct ss_inject *inj);
 
-
+/*************************************************************
+ *		PLATFORM SPECIFIC FUNCTORS
+ ************************************************************/
 typedef int (*platform_intr_inj)(struct platform *p, int len, 
 					struct ss_intr_inj *intr);
 typedef int (*platform_run)(struct platform*);
 
-typedef int (*platform_exit)(struct platform*);
+typedef int (*platform_exit)(struct platform*, int exit_code);
 typedef int (*platform_parse_data)(struct platform*, enum task_type,
 				struct hp_header *, void *data);
 typedef int (*platform_configure)(struct platform*, enum task_type,
@@ -175,6 +177,8 @@ struct ss_inject {
 	ss_inj_per_task_t		inj_per_task;
 	struct platform			*plat;			
 };
+
+struct platform* platform_init(); 
 
 /*************************************************************
  *                        SS_TSAHEYLU                        *

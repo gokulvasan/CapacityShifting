@@ -5,7 +5,7 @@ void ss_inject_del(struct ss_inject *i)
 {
 	if (!i)
 		return;
-	i->plat->exit(i->plat);
+	i->plat->exit(i->plat, 0);
 }
 
 int ss_inj_per_task(

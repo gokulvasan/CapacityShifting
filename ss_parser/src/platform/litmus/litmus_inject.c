@@ -39,8 +39,9 @@ static int litmus_release_ts(lt_t *delay)
 #endif
 static struct litmus_res_data res_data;
 
-int litmus_exit(struct platform *plt) {
-	exit(1);
+int litmus_exit(struct platform *plt, int exit_code) {
+	printf("platform Exits with:%d\n", exit_code);
+	exit(exit_code);
 }
 
 /*************************************************************
