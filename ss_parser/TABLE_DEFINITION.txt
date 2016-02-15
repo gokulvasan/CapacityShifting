@@ -179,7 +179,7 @@ Specific Details:
 			2.6.1. total count of the intervals to which this minor id
 				is associated.
 			2.6.2. type: unsigned  int.
-			2.6.3. value: only +ve
+			2.6.3. value: only +ve, >0
 		2.7. [ intr_id:est,...,]:
 			2.7.1. general comment:
 				2.7.1.1. This is an  approach to bring n same jobs of one task to one.

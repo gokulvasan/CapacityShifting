@@ -24,7 +24,7 @@ class task_intr_node():
 """
 Class used for creating interval list of a task.
 """
-class task_intr_list():
+class task_intr_association():
 	def __init__(self):
 		self.intr_list = []
 	def append_data_node(self, j_no, interval):

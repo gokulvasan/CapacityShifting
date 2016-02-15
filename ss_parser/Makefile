@@ -2,7 +2,8 @@ SRC=./src
 INC=./include/
 CONF=./conf/
 CC=gcc
-CFLAGS= -iquote$(INC) -iquote$(CONF) -Wall -DDEBUG -DSYS_HOST
+CFLAGS= -iquote$(INC) -iquote$(CONF) -Wall -DDEBUG 
+# -DSYS_HOST
 LDFLAGS=
 #SOURCES= fsm_parser.c main.c
 #OBJECTS=$(SOURCES:.cpp=.o)

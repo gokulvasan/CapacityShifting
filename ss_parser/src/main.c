@@ -82,8 +82,13 @@ int main (int argc, char *argv[])
 		}
 #else
 		 inj->plat->parse_data(inj->plat, task, inject_data->res_data->data, platform_data);
-		 inj->plat->configure(inj->plat, task, inject_data->res_data->data);
+		 ret = inj->plat->configure(inj->plat, task, inject_data->res_data->data);
+		 if(ret < 0) {
+			inj->plat->exit(inj->plat, 1);
+			break;
+		}
 #endif
+		printf("MOVING TO TSAHEYLU\n");
 		/*TSAHEYLU */
 		if(tsa->job_to_task(tsa, &inject_data->task, inject_data->res_data->data, task)) {
 			inj->plat->exit(inj->plat, 1);
