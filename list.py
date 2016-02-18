@@ -18,7 +18,6 @@ class list_node:
 	def set_data(self, data):
 		self.data = data
 
-
 class locallist:
 	def __init__(self):
 		print "Creating a new list"
@@ -40,7 +39,7 @@ class locallist:
 	def insert(self, node, data):
 		if node == None:
 			print "Error: node data is empty"
-			return
+			return None
 		node.set_nxt( list_node(data, node, node.get_nxt()) )
 
 	def get_data(self, node):
@@ -57,6 +56,7 @@ class locallist:
 				return self.head
 			else:
 				print("Error: Empty List")
+				return None
 		return node.get_nxt()
 	
 	def go_prev(self, node):

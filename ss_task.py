@@ -4,22 +4,30 @@ from simso.core.Task import GenericTask
 Class for a interval node of interval list
 """
 class task_intr_node():
-	def __init__(self, job_no, intrvl):
+	def __init__(self, job_no, intrvl, intr_id):
 		self.j_no = job_no
 		self.interval = intrvl
+		self.intr_id = intr_id
 	@property
 	def job_no(self):
 		return self.j_no
-
 	@property
 	def interval(self):
-		return self.interval	#holds container_of interval data which is embedded in a list
-					#enables easy iteration.
+		return self.interval #holds container_of interval
+				     #data which is embedded in a lst
+				     #enables easy iteration.
+	@property
+	def intr_id(self):
+		return self.intr_id
+
 	def set_job_no(self, j_no):
 		self.j_no = j_no
 
 	def set_interval(self, interval):
 		self.interval = interval
+	
+	def set_intr_id(self, intr_id):
+		self.intr_id = intr_id
 
 """
 Class used for creating interval list of a task.
@@ -27,11 +35,11 @@ Class used for creating interval list of a task.
 class task_intr_association():
 	def __init__(self):
 		self.intr_list = []
-	def append_data_node(self, j_no, interval):
+	def append_node(self, j_no, interval, intr_id):
 		"""
 		creating a composition of interval_list
 		"""
-		node = task_intr_node(j_no, interval)
+		node = task_intr_node(j_no, interval, intr_id)
 		self.intr_list.append(node)
 
 	@property

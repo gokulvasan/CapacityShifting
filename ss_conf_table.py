@@ -14,41 +14,38 @@ class reciever:
 		except socket.error, msg:
 			print >>sys.stderr, msg
 			sys.exit(1) 
-		self.__intr_count = 0
-		self.__task_count = 0
-		self.__tsk = []
-		self.__intr = []
+		self.intr_cnt = 0
+		self.tsk_cnt = 0
+		self.tsk = []
+		self.intr = []
 
-	def recv_hdr(self):
+	def __recv_hdr(self):
 		hdr = self.__recv("I I")
-		self.__intr_count = hdr[0]
-		self.__intr_count = hdr[1]
+		self.intr_cnt = hdr[0]
+		self.intr_cnt = hdr[1]
 
-	def recv_tsk(self):
+	def __recv_tsk(self):
 		i = 0
 		tsk_hdr_fmt = "I I"
-		tsk_const_data_fmt = 'I' * 6
+		tsk_const_data_fmt = 'I' * 6 
 		tsk_var_data_fmt = "I"
-		while(i < self.__task_count):
+		while(i < self.tsk_cnt):
 			hdr_data = self.__recv(tsk_hdr_fmt)
 			tsk_fmt = self.__createUnpackString(tsk_const_data_fmt, 
-								tsk_var_data_fmt, hdr_data[1])
-			tsk_node = self.recv(tsk_fmt)
-			self.__tsk.append(tsk_node)
+						tsk_var_data_fmt, 
+						hdr_data[1])
+			tsk_node = self.__recv(tsk_fmt)
+			self.tsk.append(tsk_node)
 			i = i + 1
 
-	def recv_intr(self):
+	def __recv_intr(self):
 		i = 0
 		intr_fmt = "I I I i I"
-		while(i < self.__intr_count):
+		while(i < self.intr_cnt):
 			intr_node = self.__recv(intr_fmt)
-			self.__intr.append(intr_node)
+			self.intr.append(intr_node)
 			i = i + 1
 
-	def create_tsk(self):
-		pass	
-	def create_intr(self):
-		pass
 	def __recv(self, fmt):
 		data = self.__sock.recv(256)
 		r = struct.pack('I', len(data))
@@ -58,10 +55,85 @@ class reciever:
 		upk = s.unpack(data)
 		return upk
 
-	def __task_intr_asco(self):
-		pass
 	def __createUnpackString(self, const_data_fmt, var_fmt, count):
 		return const_data_fmt + (var_fmt * count)
+
+	def recieve_table(self):
+		self.__recv_hdr()
+		self.__recv_tsk()
+		self.__recv_intr()
+
+"""
+1. create intervals.
+2. create tasks with reference of intervals.
+"""
+class association:
+	def __init__(self, reciever):
+		self.rcvr = reciever
+		self.intr_idx = 0
+		self.tsk_idx = 0
+	"""
+	converts recived data into task
+	Approach: 
+		1. make task_intr_association
+		2. make task_data
+		3. make task
+	"""
+	@staticmethod
+	def create_tsk(self, intr_list, conf):
+		if self.tsk_idx >= self.rcvr.tsk_cnt:
+			return None
+		tsk = self.rcvr.tsk[self.tsk_idx]
+		self.tsk_idx += 1
+		tskid = tsk[0]
+		tskest = tsk[1]
+		tskwcet = tsk[2]
+		tskdl = tsk[3]
+		tskperiod = tsk[4]
+		tskintrcnt = tsk[5]
+		tsk_intr_asco = task_intr_association()
+		i = self.__task_intr_asco(intr_list, tsk_intr_asco, 
+						tskintrcnt, tsk[6:])
+		if i == None:
+			return -1
+		tsk_data = task_data(tsk_intr_asco, tskintrcnt, 0)
+		conf.add_task(name="TP"+str(taskid), identifier=tskid,
+				task_type="Periodic",period=tskperiod, 
+				activation_date=tskest,wcet=tskwcet, 
+				deadline=tskdl, data = tsk_data
+				)
+	"""
+	Creates deferred_interval object 
+	"""
+	@staticmethod
+	def create_intr_list(self):
+		i = deferred_interval()
+		while self.intr_cnt < self.rcvr.intr_cnt
+			intr = self.rcvr.intr[self.intr_idx]
+			i.new_intr_append(intr[0],intr[1],intr[2],intr[3])
+			self.intr_idx += 1
+		return i
+
+	def __get_intrfrm_id(self, intr, intr_id):
+		intr_list = intr.intr_list
+		i  = intr_list.go_nxt(None)
+		while i != None:
+			data = intr_list.get_data(i)
+			if data.id == intr_id:
+				return i
+			i = intr_list.go_nxt(i)
+		print "Error: No interval with {} found".format(intr_id)	
+		return None
+
+	def __task_intr_asco(self, intr, tsk_intr_asco, tskintrcnt, intr_asco):
+		i = 1
+		for a in intr_asco:
+			intr_node = self.__get_intrfrm_id(intr, a)
+			if intr_node == None:
+				print "Error: Abort System"
+				return -1
+			tsk_intr_asco.append_node(i, intr_node, a)
+
 class client:
 	def __init__(self):
 		sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

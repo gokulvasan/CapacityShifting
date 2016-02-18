@@ -42,14 +42,17 @@ class interval(object):
 		self.intr_list = locallist() 
 		self.curr_point = None
 
-	def add_interval(self, intr_id, start, end, sc):
+	def new_intr_append(self, intr_id, start, end, sc):
 		"""
 		This makes linked list of interval.
 		"""	
 		intr_node = interval_node(intr_id, start, end, sc)
 		self.intr_list.append(intr_node)
 		self.intr_count += 1
-
+	def new_intr_insert(self, intr_id, start, end, sc, node)
+		intr_node = interval_node(intr_id, start, end, sc)
+		self.intr_list.insert(node, intr_node)
+		self.intr_count += 1	
 	def goto_nxt_interval(self, data_type):
 		"""
 		This will move the curr_interval to nxt interval
@@ -121,6 +124,10 @@ class interval(object):
 
 	def Guarantee_algo(self, Atask):
 		pass
+
+	@property
+	def intr_list(self)
+		return self.intr_list
 
 """
 1. Create Relation Window
