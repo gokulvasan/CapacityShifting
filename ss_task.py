@@ -96,10 +96,26 @@ class task_data:
 	@property
 	def tsk_type(self):
 		return self.tsk_type
-
+	
+	# This needs a better abstraction later
 	def set_tsk_data(self, data, task):
 		task._task_info.data = data
 
+	def print_data(self):
+		print "***************"
+		print "tsk_type {}".format(self.tsk_type)
+		print "curr_index{}".format(self.curr_index)
+		print "intr_count {}".format(self.intr_count)
+		i = 0
+		while i < self.intr_count:
+			print "----------"
+			j = self.intr_list.get_node(i)
+			print "j_no {}".format(j.j_no)
+			print "interval {}".format(j.interval)
+			print "intr id {}".format(j.intr_id)
+			i += 1
+		print "-----------"
+		print "intr list {}".format(self.intr_list)	
 """
 #test
 t = task_intr_list()

@@ -1,8 +1,8 @@
 
 from simso.core import Scheduler
-from list import locallist
+import ss_list
 from ss_task import task_data
-
+from ss_task import task_intr_association 
 class deferred_update:
 	def __init__(self):
 		self.update_val = 0
@@ -39,7 +39,7 @@ class interval(object):
 	def __init__(self):
 		self.curr_interval=None
 		self.intr_count=0
-		self.intr_list = locallist() 
+		self.intr_list = ss_list.locallist() 
 		self.curr_point = None
 
 	def new_intr_append(self, intr_id, start, end, sc):
@@ -49,7 +49,7 @@ class interval(object):
 		intr_node = interval_node(intr_id, start, end, sc)
 		self.intr_list.append(intr_node)
 		self.intr_count += 1
-	def new_intr_insert(self, intr_id, start, end, sc, node)
+	def new_intr_insert(self, intr_id, start, end, sc, node):
 		intr_node = interval_node(intr_id, start, end, sc)
 		self.intr_list.insert(node, intr_node)
 		self.intr_count += 1	
@@ -58,9 +58,9 @@ class interval(object):
 		This will move the curr_interval to nxt interval
 		"""
 		if self.curr_point == None:
-			self.curr_point = self.intr_list.get_nxt(None)
+			self.curr_point = self.intr_list.go_nxt(None)
 		else:
-			self.curr_point = self.intr_list.get_nxt(self.curr_point)
+			self.curr_point = self.intr_list.go_nxt(self.curr_point)
 			if self.curr_point == self.intr_list.get_head():
 				return None
 		return self.intr_list.get_data(self.curr_point)
@@ -71,14 +71,14 @@ class interval(object):
 		data_type: could be used to return list data or interval itself
 		"""
 		if self.curr_point == None:
-			self.curr_point = self.intr_list.get_prev(None)
+			self.curr_point = self.intr_list.go_prev(None)
 		else:
-			self.curr_point = self.intr_list.get_prev(self.curr_point)
+			self.curr_point = self.intr_list.go_prev(self.curr_point)
 			if self.curr_point == self.intr_list.get_head():
 				return None
 		return self.intr_list.get_data(self.curr_point)
-	
-	@property
+
+
 	def reset_iterator(self):
 		"""
 		Resets the iterator 
@@ -124,10 +124,25 @@ class interval(object):
 
 	def Guarantee_algo(self, Atask):
 		pass
-
-	@property
-	def intr_list(self)
+	
+	def intr_list(self):
 		return self.intr_list
+	def print_intr_list(self):
+		i = 0
+		node = None
+		while i < self.intr_count:
+			node = self.intr_list.go_nxt(node)
+			data = self.intr_list.get_data(node)
+			self.__print_intr(data)
+			i += 1
+
+	def __print_intr(self, node):
+		print "==========="
+		print "intr_id{}".format(node.id)
+		print "start {}".format(node.start)
+		print "end {}".format(node.end)
+		print "SC {}".format(node.sc)
+		
 
 """
 1. Create Relation Window
@@ -167,9 +182,7 @@ class deferred_interval(interval):
 		"""
 		pass
 """
-i = deferred_interval()
-i.add_interval(1, 1, 1, 1)
-i.add_interval(2,2,3,1)
-
-i.create_relation_window()
+i = interval()
+i.new_intr_append(1, 1, 1, 1)
 """
+

@@ -28,13 +28,16 @@ class locallist:
 		if self.head == None:
 			print "List seems empty"
 			self.head = node
-			node.set_nxt(node)
-			node.set_prev(node)
+			node.set_nxt(self.head)
+			node.set_prev(self.head)
 		else:
 			print "Adding new data"
-			node.set_prev(self.head)
-			node.set_nxt(self.head.nxt)
-			self.head.set_nxt(node)
+			node.set_nxt(self.head)
+			node.set_prev(self.head.get_prev)
+			prev = self.head.get_prev()
+			prev.set_nxt(node)
+			self.head.set_prev(node)
+			
 
 	def insert(self, node, data):
 		if node == None:
@@ -68,7 +71,7 @@ class locallist:
 		return node.get_prev()
 	def get_head(self):
 		return self.head
-
+"""
 i = locallist()
 i.append(1)
 i.append(2)
@@ -83,4 +86,4 @@ print i.get_data(n)
 # print i.get_data(None)
 n = i.go_nxt(n)
 print i.get_data(n)
-
+"""

@@ -3,12 +3,14 @@ import sys
 import os
 import struct
 import binascii
+from interval import * 
+from simso.configuration import Configuration
 
 server_addr = "/tmp/ss_parser"
 
 class reciever:
 	def __init__(self, serv_addr):
-		self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.__sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 		try:
 			self.__sock.connect(serv_addr)
 		except socket.error, msg:
@@ -22,8 +24,8 @@ class reciever:
 	def __recv_hdr(self):
 		hdr = self.__recv("I I")
 		self.intr_cnt = hdr[0]
-		self.intr_cnt = hdr[1]
-
+		self.tsk_cnt = hdr[1]
+		print "intr{} task{}".format(self.intr_cnt, self.tsk_cnt)
 	def __recv_tsk(self):
 		i = 0
 		tsk_hdr_fmt = "I I"
@@ -37,6 +39,7 @@ class reciever:
 			tsk_node = self.__recv(tsk_fmt)
 			self.tsk.append(tsk_node)
 			i = i + 1
+		print "so recieved task {}".format(i)
 
 	def __recv_intr(self):
 		i = 0
@@ -82,9 +85,11 @@ class association:
 	@staticmethod
 	def create_tsk(self, intr_list, conf):
 		if self.tsk_idx >= self.rcvr.tsk_cnt:
+			print "task count: {}".format(self.tsk_idx)
 			return None
 		tsk = self.rcvr.tsk[self.tsk_idx]
 		self.tsk_idx += 1
+
 		tskid = tsk[0]
 		tskest = tsk[1]
 		tskwcet = tsk[2]
@@ -94,21 +99,23 @@ class association:
 		tsk_intr_asco = task_intr_association()
 		i = self.__task_intr_asco(intr_list, tsk_intr_asco, 
 						tskintrcnt, tsk[6:])
-		if i == None:
+		if i != 0:
 			return -1
 		tsk_data = task_data(tsk_intr_asco, tskintrcnt, 0)
-		conf.add_task(name="TP"+str(taskid), identifier=tskid,
+		tsk_data.print_data()
+		conf.add_task(name="TP"+str(tskid), identifier=tskid,
 				task_type="Periodic",period=tskperiod, 
 				activation_date=tskest,wcet=tskwcet, 
 				deadline=tskdl, data = tsk_data
 				)
+		return 0
 	"""
 	Creates deferred_interval object 
 	"""
 	@staticmethod
 	def create_intr_list(self):
 		i = deferred_interval()
-		while self.intr_cnt < self.rcvr.intr_cnt
+		while self.intr_idx < self.rcvr.intr_cnt:
 			intr = self.rcvr.intr[self.intr_idx]
 			i.new_intr_append(intr[0],intr[1],intr[2],intr[3])
 			self.intr_idx += 1
@@ -133,6 +140,8 @@ class association:
 				print "Error: Abort System"
 				return -1
 			tsk_intr_asco.append_node(i, intr_node, a)
+			i += 1
+		return 0
 
 class client:
 	def __init__(self):
@@ -184,3 +193,23 @@ class client:
 	def __createUnpackString(self, string, fmt, count):
 		return string + (fmt * count)
 
+""""
+r = reciever(server_addr)
+r.recieve_table()
+a = association(r)
+intr = a.create_intr_list(a)
+intr.print_intr_list()
+
+i = 0
+c = Configuration()
+while 1:
+	j = a.create_tsk(a, intr, c)
+	if j != 0:
+		break
+	
+	print "=================task created==========="
+	i += 1
+
+print "total tasks {}".format(i)
+"""
+	 
