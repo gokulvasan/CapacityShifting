@@ -142,7 +142,7 @@ class association:
 			tsk_intr_asco.append_node(i, intr_node, a)
 			i += 1
 		return 0
-
+"""
 class client:
 	def __init__(self):
 		sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -193,7 +193,8 @@ class client:
 	def __createUnpackString(self, string, fmt, count):
 		return string + (fmt * count)
 
-""""
+"""
+"""
 r = reciever(server_addr)
 r.recieve_table()
 a = association(r)
@@ -212,4 +213,3 @@ while 1:
 
 print "total tasks {}".format(i)
 """
-	 
