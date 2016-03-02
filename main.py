@@ -16,6 +16,8 @@ def main():
 	associate = association(remote)
 
 	interval = associate.create_intr_list(associate)
+
+	interval = associate.create_relation_window(interval)
 	
 	while 1:
 		j = associate.create_tsk(associate, interval, configuration)

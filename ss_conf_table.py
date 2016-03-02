@@ -26,6 +26,7 @@ class reciever:
 		self.intr_cnt = hdr[0]
 		self.tsk_cnt = hdr[1]
 		print "intr{} task{}".format(self.intr_cnt, self.tsk_cnt)
+
 	def __recv_tsk(self):
 		i = 0
 		tsk_hdr_fmt = "I I"
@@ -109,6 +110,66 @@ class association:
 				deadline=tskdl, data = tsk_data
 				)
 		return 0
+
+	def __create_deferred_intr_list(self, interval):
+		i = 0
+		interval.reset_iterator()	
+		while i < interval.intr_count:
+			deferred_node = deferred_update()
+			list_node = interval.goto_nxt_interval(1)
+			interval_node = list_node.get_data() 
+			data = deferred_intr_node(
+				deferred_node, interval_node)
+			list_node.set_data(data)
+			i += 1
+
+	def ___create_relation(self, interval, intr_count, lent_node):
+		i = 0
+		while (i + intr_count) < interval.intr_count:
+			data = interval.goto_nxt_interval(None)
+			i += 1
+			if data.sc < 0:
+				continue
+			else:
+				break
+
+		node = interval.goto_prev_interval(Node)
+		
+		while 1:
+			data = interval.goto_prev_interval(None)
+			data.set_lent_till(node)
+			data.set_lender(lent_node)
+			if data.sc >= 0
+				break
+		return i	
+	def __create_interval_relation(self, interval):
+		i = 0
+		interval.reset_iterator()
+		while i < interval.intr_count:
+			node = interval.goto_nxt_interval(1)
+			data = node.get_data()
+			i += 1
+			if i >= interval.intr_count
+				break 
+			node1 = interval.goto_nxt_interval(1)
+			data1 = node1.get_data()
+			if data1.sc < 0:
+				node1 = interval.goto_prev_interval(1)
+				i += self.___create_relation(
+					self, interval, i, node)
+			else:
+				i += 1
+
+	@staticmethod
+	def create_relation_window(self, interval):
+		"""
+		This will create realtion window
+			1. create deferred_intr_node for each interval
+			2. then create relation window
+			3. complexity: n^2, but considered offline phase
+		"""
+		
+		return interval
 	"""
 	Creates deferred_interval object 
 	"""
@@ -119,6 +180,7 @@ class association:
 			intr = self.rcvr.intr[self.intr_idx]
 			i.new_intr_append(intr[0],intr[1],intr[2],intr[3])
 			self.intr_idx += 1
+		i.print_intr_list()
 		return i
 
 	def __get_intrfrm_id(self, intr, intr_id):
@@ -132,14 +194,14 @@ class association:
 		print "Error: No interval with {} found".format(intr_id)	
 		return None
 
-	def __task_intr_asco(self, intr, tsk_intr_asco, tskintrcnt, intr_asco):
+	def __task_intr_asco(self, intr, tsk_intr_lst, tskintrcnt, intr_asco):
 		i = 1
 		for a in intr_asco:
 			intr_node = self.__get_intrfrm_id(intr, a)
 			if intr_node == None:
 				print "Error: Abort System"
 				return -1
-			tsk_intr_asco.append_node(i, intr_node, a)
+			tsk_intr_lst.append_node(i, intr_node, a)
 			i += 1
 		return 0
 """

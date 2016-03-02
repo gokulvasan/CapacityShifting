@@ -2,7 +2,53 @@
 from simso.core import Scheduler
 import ss_list
 from ss_task import task_data
-from ss_task import task_intr_association 
+from ss_task import task_intr_association
+
+class deferred_intr_node:
+	def __init__(self, deferred_update, interval_node):
+		self.def_update = deferred_update
+		self.interval = interval_node
+
+	@property
+	def id(self):
+		return self.interval.intr_id
+	@property
+	def start(self):
+		return self.interval.start
+	@property
+	def end(self):
+		return self.interval.end
+	@property
+	def sc(self):
+		return self.interval.sc
+	def set_sc(self, sc):
+		self.interval.sc = sc
+	def set_start(self, start):
+		self.interval.start = start
+	def set_end(self,end):
+		self.interval.end = end
+
+	@property
+	def update_val(self):
+		return self.def_update.update_val
+	@property
+	def rec_val(self):
+		return self.def_update.rec_val
+	@property
+	def lent_till(self):
+		return self.def_update.lent_till
+	@property
+	def lender(self):
+		return self.def_update.lender	
+	def set_update_val(self, val):
+		self.def_update.update_val = val
+	def set_rec_Val(self, val):
+		self.def_update.rec_val = val
+	def set_lent_till(self, lent_till):
+		self.def_update.lent_till = lent_till
+	def set_lender(self, lender):
+		self.def_update.lender = lender
+
 class deferred_update:
 	def __init__(self):
 		self.update_val = 0
@@ -29,7 +75,7 @@ class interval_node:
 	def sc(self):
 		return self.sc
 	def set_sc(self, val):
-		self.sc += val
+		self.sc = val
 	def set_start(self, new_start):
 		self.start = new_start
 	def set_end(self, new_end):
@@ -40,7 +86,7 @@ class interval(object):
 		self.curr_interval=None
 		self.intr_count=0
 		self.intr_list = ss_list.locallist() 
-		self.curr_point = None
+		self.curr_point = None		#works like generator 
 
 	def new_intr_append(self, intr_id, start, end, sc):
 		"""
@@ -49,10 +95,12 @@ class interval(object):
 		intr_node = interval_node(intr_id, start, end, sc)
 		self.intr_list.append(intr_node)
 		self.intr_count += 1
+
 	def new_intr_insert(self, intr_id, start, end, sc, node):
 		intr_node = interval_node(intr_id, start, end, sc)
 		self.intr_list.insert(node, intr_node)
-		self.intr_count += 1	
+		self.intr_count += 1
+	
 	def goto_nxt_interval(self, data_type):
 		"""
 		This will move the curr_interval to nxt interval
@@ -63,7 +111,10 @@ class interval(object):
 			self.curr_point = self.intr_list.go_nxt(self.curr_point)
 			if self.curr_point == self.intr_list.get_head():
 				return None
-		return self.intr_list.get_data(self.curr_point)
+		if data_type == None:
+			return self.intr_list.get_data(self.curr_point)
+		if data_type == 1:
+			return self.curr_point
 
 	def goto_prev_interval(self, data_type):
 		"""
@@ -76,8 +127,10 @@ class interval(object):
 			self.curr_point = self.intr_list.go_prev(self.curr_point)
 			if self.curr_point == self.intr_list.get_head():
 				return None
-		return self.intr_list.get_data(self.curr_point)
-
+		if data_type == None:
+			return self.intr_list.get_data(self.curr_point)
+		if data_type == 1:
+			return self.curr_point
 
 	def reset_iterator(self):
 		"""
@@ -145,30 +198,17 @@ class interval(object):
 		
 
 """
-1. Create Relation Window
-2. method to update the values : rec_val, update_val
-3. iteration function that does the deferred update.
-Basically I will try to use composition method to add 
-additional data to existing data.
+	1. Create Relation Window
+	2. method to update the values : rec_val, update_val
+	3. iteration function that does the deferred update.
+	Basically I will try to use composition method to add 
+	additional data to existing data.
 """
+
 class deferred_interval(interval):
 	def __init__(self):
 		super(deferred_interval, self).__init__()
 		print "creating deferred interval"
-
-	"""
-	This should be moved to association class.
-	"""
-	def create_relation_window(self):
-		"""
-		This will create realtion window
-		1. Append deferred interval data
-		2. create references of relation window
-		"""
-		if self.intr_list.get_data(None) == None:
-			print "No intervals still defined"
-		print self.intr_count
-		pass
 
 	def update_sc(self, curr_intr, task):
 		"""
@@ -181,6 +221,7 @@ class deferred_interval(interval):
 		This is where defereed update happens
 		"""
 		pass
+
 """
 i = interval()
 i.new_intr_append(1, 1, 1, 1)
