@@ -111,6 +111,7 @@ class association:
 				)
 		return 0
 
+	@staticmethod
 	def __create_deferred_intr_list(self, interval):
 		i = 0
 		interval.reset_iterator()	
@@ -126,22 +127,29 @@ class association:
 	def ___create_relation(self, interval, intr_count, lent_node):
 		i = 0
 		while (i + intr_count) < interval.intr_count:
-			data = interval.goto_nxt_interval(None)
+			node = interval.goto_nxt_interval(1)
+			data = node.get_data()
 			i += 1
-			if data.sc < 0:
-				continue
-			else:
+			print "==========intr id {}".format(data.id)
+			if data.sc >= 0:
 				break
-
-		node = interval.goto_prev_interval(Node)
-		
+		node = interval.goto_prev_interval(1)
+		if node == None:
+			print "Error: lent till node is empty"
+			return
 		while 1:
 			data = interval.goto_prev_interval(None)
+			if data == None:
+				print "moved to head"
+				return
 			data.set_lent_till(node)
-			data.set_lender(lent_node)
-			if data.sc >= 0
+			if data.sc >= 0:
 				break
-		return i	
+			data.set_lender(lent_node)
+
+		interval.set_iterator(node)
+		return i
+
 	def __create_interval_relation(self, interval):
 		i = 0
 		interval.reset_iterator()
@@ -149,27 +157,37 @@ class association:
 			node = interval.goto_nxt_interval(1)
 			data = node.get_data()
 			i += 1
-			if i >= interval.intr_count
-				break 
+			if i >= interval.intr_count:
+				break
+			if data.sc < 0:
+				print "Error: relation window creation"
+				return
+ 
 			node1 = interval.goto_nxt_interval(1)
+			if node1 == None:
+				return
 			data1 = node1.get_data()
 			if data1.sc < 0:
+				#interval.set_iterator(node1)
 				node1 = interval.goto_prev_interval(1)
+				if node1 == None:
+					return
 				i += self.___create_relation(
-					self, interval, i, node)
+					interval, i, node)
+				print " SC < 0"
 			else:
 				i += 1
-
 	@staticmethod
 	def create_relation_window(self, interval):
 		"""
 		This will create realtion window
 			1. create deferred_intr_node for each interval
 			2. then create relation window
-			3. complexity: n^2, but considered offline phase
+			3. complexity: n^2 + R, but considered offline phase
 		"""
-		
-		return interval
+		self.__create_deferred_intr_list(self, interval)
+		self.__create_interval_relation(interval)	
+		interval.print_def_interval()
 	"""
 	Creates deferred_interval object 
 	"""

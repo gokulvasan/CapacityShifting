@@ -28,23 +28,33 @@ class locallist:
 		if self.head == None:
 			print "List seems empty"
 			self.head = node
-			node.set_nxt(self.head)
-			node.set_prev(self.head)
+			node.set_nxt(node)
+			node.set_prev(node)
 		else:
 			print "Adding new data"
 			node.set_nxt(self.head)
-			node.set_prev(self.head.get_prev)
-			prev = self.head.get_prev()
-			prev.set_nxt(node)
+			head_prev = self.head.get_prev()
 			self.head.set_prev(node)
-			
-
+			node.set_prev(head_prev)
+			head_prev.set_nxt(node)
+			#print "*****************"
+			#print node.get_data()
+			#print node.get_prev().get_data()
+			#print node.get_nxt().get_data()	
+			#print "****************"
 	def insert(self, node, data):
 		if node == None:
 			print "Error: node data is empty"
 			return None
-		node.set_nxt( list_node(data, node, node.get_nxt()) )
-
+		new = list_node(data, node.get_nxt(), node)
+		node_nxt = node.get_nxt()
+		node_nxt.set_prev(new)
+		node.set_nxt(new)
+		print "******insert***********"
+		print new.get_data()
+		print new.get_prev().get_data()
+		print new.get_nxt().get_data()	
+		print "****************"
 	def get_data(self, node):
 		if self.head == None:
 			print "Error: Empty List"
@@ -63,20 +73,26 @@ class locallist:
 		return node.get_nxt()
 	
 	def go_prev(self, node):
+		#if node == self.head:
+		#	return None
 		if node == None:
-			if self.head != None:
-				return self.head
-			else:
-				print("Error: Empty List")
+			print("Error: Empty List")
 		return node.get_prev()
+
 	def get_head(self):
 		return self.head
+
 """
 i = locallist()
 i.append(1)
 i.append(2)
 i.append(3)
+i.append(4)
 n = i.go_nxt(None)
+print i.get_data(n)
+n = i.go_nxt(n)
+print i.get_data(n)
+n = i.go_nxt(n)
 print i.get_data(n)
 n = i.go_nxt(n)
 print i.get_data(n)
@@ -84,6 +100,17 @@ i.insert(n,5)
 n = i.go_nxt(n)
 print i.get_data(n)
 # print i.get_data(None)
-n = i.go_nxt(n)
+print "moving prev"
+n = i.go_prev(n)
+print i.get_data(n)
+n = i.go_prev(n)
+print i.get_data(n)
+n = i.go_prev(n)
+print i.get_data(n)
+n = i.go_prev(n)
+print i.get_data(n)
+n = i.go_prev(n)
+print i.get_data(n)
+n = i.go_prev(n)
 print i.get_data(n)
 """

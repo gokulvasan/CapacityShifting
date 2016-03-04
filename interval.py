@@ -113,7 +113,7 @@ class interval(object):
 				return None
 		if data_type == None:
 			return self.intr_list.get_data(self.curr_point)
-		if data_type == 1:
+		elif data_type == 1:
 			return self.curr_point
 
 	def goto_prev_interval(self, data_type):
@@ -121,15 +121,17 @@ class interval(object):
 		Moves interval to previous interval from curr_point
 		data_type: could be used to return list data or interval itself
 		"""
+		if self.curr_point == self.intr_list.get_head():
+			return None
+
 		if self.curr_point == None:
 			self.curr_point = self.intr_list.go_prev(None)
 		else:
 			self.curr_point = self.intr_list.go_prev(self.curr_point)
-			if self.curr_point == self.intr_list.get_head():
-				return None
+
 		if data_type == None:
 			return self.intr_list.get_data(self.curr_point)
-		if data_type == 1:
+		elif data_type == 1:
 			return self.curr_point
 
 	def reset_iterator(self):
@@ -137,6 +139,8 @@ class interval(object):
 		Resets the iterator 
 		"""
 		self.curr_point = None
+	def set_iterator(self, iter_point):
+		self.curr_point = iter_point
 
 	def set_curr_interval(self, intr):
 		"""
@@ -221,6 +225,24 @@ class deferred_interval(interval):
 		This is where defereed update happens
 		"""
 		pass
+	def print_def_interval(self):
+		i = 0
+		node = None
+		while i < self.intr_count:
+			node = self.intr_list.go_nxt(node)
+			data = self.intr_list.get_data(node)
+			self.__print_intr(data)
+			i += 1
+	def __print_intr(self, node):
+		print "==========="
+		print "intr_id{}".format(node.id)
+		print "start {}".format(node.start)
+		print "end {}".format(node.end)
+		print "SC {}".format(node.sc)
+		print "update_val {}".format(node.update_val)
+		print "rec_Val {}".format(node.rec_val)
+		print "lent_till {}".format(node.lent_till)
+		print "lender {}".format(node.lender)
 
 """
 i = interval()
