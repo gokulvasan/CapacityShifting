@@ -133,21 +133,23 @@ class association:
 			print "==========intr id {}".format(data.id)
 			if data.sc >= 0:
 				break
-		node = interval.goto_prev_interval(1)
-		if node == None:
-			print "Error: lent till node is empty"
-			return
+			else:
+				lent_till = node
+		#node = interval.goto_prev_interval(1)
+		#if node == None:
+		#	print "Error: lent till node is empty"
+		#	return
 		while 1:
 			data = interval.goto_prev_interval(None)
 			if data == None:
 				print "moved to head"
 				return
-			data.set_lent_till(node)
+			data.set_lent_till(lent_till)
 			if data.sc >= 0:
 				break
 			data.set_lender(lent_node)
 
-		interval.set_iterator(node)
+		interval.set_iterator(lent_till)
 		return i
 
 	def __create_interval_relation(self, interval):
@@ -186,7 +188,8 @@ class association:
 			3. complexity: n^2 + R, but considered offline phase
 		"""
 		self.__create_deferred_intr_list(self, interval)
-		self.__create_interval_relation(interval)	
+		self.__create_interval_relation(interval)
+		print "===============printing deferred interval==================="	
 		interval.print_def_interval()
 	"""
 	Creates deferred_interval object 
@@ -199,6 +202,10 @@ class association:
 			i.new_intr_append(intr[0],intr[1],intr[2],intr[3])
 			self.intr_idx += 1
 		i.print_intr_list()
+		print "=============NOW REVERSING==========="
+		i.intr_reverse()
+		i.print_intr_list()
+
 		return i
 
 	def __get_intrfrm_id(self, intr, intr_id):

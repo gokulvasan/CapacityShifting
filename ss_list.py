@@ -50,11 +50,28 @@ class locallist:
 		node_nxt = node.get_nxt()
 		node_nxt.set_prev(new)
 		node.set_nxt(new)
-		print "******insert***********"
-		print new.get_data()
-		print new.get_prev().get_data()
-		print new.get_nxt().get_data()	
-		print "****************"
+		#print "******insert***********"
+		#print new.get_data()
+		#print new.get_prev().get_data()
+		#print new.get_nxt().get_data()	
+		#print "****************"
+	def reverse(self):
+		if self.head == None:
+			print "Error: reverse on Empty List"
+			return
+		cur = self.head
+		fut = None
+		nxt = None
+		prv = None
+		while(fut != self.head):
+			fut = cur.get_nxt()
+			nxt = cur.get_nxt()
+			prv = cur.get_prev()
+			cur.set_nxt(prv)
+			cur.set_prev(nxt)
+			cur = fut
+		self.head = self.head.get_nxt()
+
 	def get_data(self, node):
 		if self.head == None:
 			print "Error: Empty List"
@@ -73,14 +90,24 @@ class locallist:
 		return node.get_nxt()
 	
 	def go_prev(self, node):
-		#if node == self.head:
-		#	return None
+		if node == self.head:
+			return None
 		if node == None:
 			print("Error: Empty List")
 		return node.get_prev()
 
 	def get_head(self):
 		return self.head
+
+	def print_list(self):
+		cur = self.head
+		while 1:
+			print "data {}".format(cur.get_data())
+			#print "prev {}".format(cur.get_prev().get_data())
+			#print "nxt {}".format(cur.get_nxt().get_data())
+			cur = cur.get_nxt()
+			if cur == self.head:
+				break
 
 """
 i = locallist()
@@ -99,6 +126,16 @@ print i.get_data(n)
 i.insert(n,5)
 n = i.go_nxt(n)
 print i.get_data(n)
+i.append(6)
+print "****************"
+i.print_list()
+print "****************"
+i.reverse()
+i.print_list()
+print "-----again reverse----"
+i.reverse()
+i.print_list()
+
 # print i.get_data(None)
 print "moving prev"
 n = i.go_prev(n)

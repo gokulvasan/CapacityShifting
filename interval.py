@@ -172,6 +172,8 @@ class interval(object):
 			if intr.sc >= 0:			#task interval is +ve just leave
 				break
 			tmp = self.intr_list.go_prev(tmp)	#else keep iterating backwards
+	def intr_reverse(self):
+		self.intr_list.reverse()
 
 	def split_intr(self, intr, split_point):
 		pass
