@@ -98,9 +98,10 @@ class interval(object):
 
 	def new_intr_insert(self, intr_id, start, end, sc, node):
 		intr_node = interval_node(intr_id, start, end, sc)
-		self.intr_list.insert(node, intr_node)
+		list_node = self.intr_list.insert(node, intr_node)
 		self.intr_count += 1
-	
+		return 	list_node
+
 	def goto_nxt_interval(self, data_type):
 		"""
 		This will move the curr_interval to nxt interval
@@ -139,8 +140,12 @@ class interval(object):
 		Resets the iterator 
 		"""
 		self.curr_point = None
+
 	def set_iterator(self, iter_point):
 		self.curr_point = iter_point
+
+	def get_curr_iterator(self):
+		return self.curr_point
 
 	def set_curr_interval(self, intr):
 		"""
@@ -155,6 +160,31 @@ class interval(object):
 	def get_intr_count(self):
 		return self.intr_count
 
+	def intr_reverse(self):
+		self.intr_list.reverse()
+
+	def intr_list(self):
+		return self.intr_list
+
+	def update_intr(self, time_progressed, task): 
+		"""
+		Here time progress is in slot, but
+		I should make this work generically, i.e.
+		when notion of slot is removed then still it 
+		should work in next level
+		WHAT SHLD THIS DO:
+			1. based on time progressed; 
+				progress the current interval
+			2. update_sc
+		"""
+		if time_progressed >= self.curr_interval.end:
+			curr_intr = self.goto_nxt_interval(None)
+			if curr_intr == None
+				return None
+			self.set_curr_interval(curr_intr)
+
+		self.update_sc(task.data)
+
 	def update_sc(self, task_data):
 		"""
 		Original update_sc
@@ -166,26 +196,116 @@ class interval(object):
 			if 2 == task_data.tsk_type: 		#softAper
 				break
 			intr = tmp.get_data()
-			intr.set_sc(intr.sc()+1)
+			intr.set_sc(intr.sc + 1)
 			if intr.id == self.curr_interval.id:	#task belongs to same interval
 				break
-			if intr.sc >= 0:			#task interval is +ve just leave
+			if intr.sc >= 0:			#task intr is +ve just leave
 				break
 			tmp = self.intr_list.go_prev(tmp)	#else keep iterating backwards
-	def intr_reverse(self):
-		self.intr_list.reverse()
 
-	def split_intr(self, intr, split_point):
-		pass
+	def Aperiodic_test(self, Atask,time_progressed):
+		curr_iter_point = self.curr_point
+		ret = None
 
-	def Acceptance_test(self, Atask):
-		pass
+		wcet_time = Atask.wcet
+		wcet_slot = wcet_time / quantum_notion
+		dl_time = Atask.dl
+		dl_slot = dl_time / quantum_notion
 
-	def Guarantee_algo(self, Atask):
-		pass
-	
-	def intr_list(self):
-		return self.intr_list
+		if self.acceptance_test(wcet_slot, dl_slot):
+			guarantee_task(Atask, wcet_slot, dl_slot, time_progressed)
+			ret = Atask;
+
+		self.set_iterator(curr_iter_point)
+		return ret
+
+	def acceptance_test(self,wcet_slot, dl_slot):
+
+		intr = self.curr_interval
+		sum = 0
+		while 1:
+			if intr.end < dl_slot:
+				break
+			sum += intr.sc
+			intr = self.goto_nxt_interval(None)
+
+		dl_sc = min(intr.sc, (dl_slot - intr.start) )
+		sum += max(0, dl_sc)
+
+		if sum >= wcet_slot:
+			return 1
+		else:
+			return 0
+
+	def split_intr(self, intr_right, split_point, time_progressed):
+		"""
+			# here do affilation in aperiodic task.i.e.
+			# association 
+		"""
+		new_intr_id = self.intr_count + 1
+		new_intr_end = split_point
+
+		if intr_right == self.get_curr_interval():
+			new_intr_start = time_progresed
+		else:	
+			new_intr_start = intr_right.start
+
+		new_intr_sc = (split_point - new_intr_start) + 1
+		
+		intr_right.start = split_point + 1
+		intr_right.sc = intr.sc - new_intr_sc
+		new_intr_sc = new_intr_sc - min(0, intr_right.sc)
+		
+		curr_point = self.get_curr_iterator()
+		insert_node = self.intr_list.go_prev(curr_point)
+		
+		intr_left = new_intr_insert(new_intr_id, 
+				new_intr_start,
+				new_intr_end,
+				new_intr_sc,
+				insert_node)
+		return intr_left
+
+	def guarantee_task(self, Atask, wcet_slot, dl_slot, time_progressed):
+		
+		"""
+		This goes with the assumption that acceptance
+		test has already moved curr_iterator to interval
+		where Atask will fall.
+		"""
+		intr_left = None
+		intr = self.get_curr_iterator()
+		intr_right = self.intr_list.get_data(intr)
+		if intr_right.end > dl_slot:
+			intr_left = self.split_intr(intr_right,
+						 dl_slot, time_progressed)
+			intr_left_data = self.intr_list.get_data(intr_left)
+
+			task_intr_asco = task_intr_association()
+			task_intr_asco.append_node(1, intr_left, intr_left_data.id)
+			tsk_data = task_data(tsk_intr_asco, 1, 1)
+			Atask._task_info.data = tsk_data #This needs better abstraction
+			self.set_curr_iterator(intr_left)
+
+		delta = wcet_slot
+		if intr_left != None:
+			Intr_iterator = intr_left_data
+		else:
+			intr_iterator = intr_right
+
+		while delta:
+			if intr_iterator.sc > 0:
+				if intr_iterator.sc >= delta:
+					intr_iterator.sc = intr_iterator.sc - delta
+					delta = 0
+				else
+					delta = delta - intr_iterator.sc
+					intr_iterator.sc = -delta
+			else
+				intr_iterator.sc += -delta
+			
+			intr_iterator = goto_prev_interval(None)
+
 	def print_intr_list(self):
 		i = 0
 		node = None
@@ -222,10 +342,9 @@ class deferred_interval(interval):
 		"""
 		pass
 
+	def  goto_nxt_interval(self, data_type):
+		pass
 	def set_curr_interval(self):
-		"""
-		This is where defereed update happens
-		"""
 		pass
 	def print_def_interval(self):
 		i = 0
@@ -236,16 +355,25 @@ class deferred_interval(interval):
 			self.__print_intr(data)
 			i += 1
 	def __print_intr(self, node):
-		print "==========="
+		print "======{}=====".format(node)
 		print "intr_id{}".format(node.id)
 		print "start {}".format(node.start)
 		print "end {}".format(node.end)
 		print "SC {}".format(node.sc)
 		print "update_val {}".format(node.update_val)
 		print "rec_Val {}".format(node.rec_val)
-		print "lent_till {}".format(node.lent_till)
-		print "lender {}".format(node.lender)
-
+		if node.lent_till != None:
+			l_till = node.lent_till
+			data = l_till.get_data()
+			print "lent_till {}".format(data.id)
+		else:
+			print "lent_till {}".format(None)
+		if node.lender != None:
+			lender = node.lender
+			data = lender.get_data()
+			print "lender {}".format(data.id)
+		else:
+			print "lender {}".format(None)
 """
 i = interval()
 i.new_intr_append(1, 1, 1, 1)

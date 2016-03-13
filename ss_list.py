@@ -55,6 +55,8 @@ class locallist:
 		#print new.get_prev().get_data()
 		#print new.get_nxt().get_data()	
 		#print "****************"
+		return new
+
 	def reverse(self):
 		if self.head == None:
 			print "Error: reverse on Empty List"

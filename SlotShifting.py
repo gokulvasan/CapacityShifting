@@ -1,4 +1,4 @@
-from simso.core import Scheduler
+from simso.core import Scheduler, Timer
 
 class SlotShifting(Scheduler):
 
@@ -11,15 +11,18 @@ class SlotShifting(Scheduler):
 		self.slot_boundary = 0
 		self.slot_count = 0
 		self.slot_timer = Timer(
-			self.sim, SlotShifting.decision, (self, ), 5,
-			cpu=self.processors[0], in_ms=True, one_shot=True)
+			self.sim, SlotShifting.decision, (self, ), 1,
+			cpu=self.processors[0], in_ms=True, one_shot=False)
 		self.slot_timer.start()
+		print " IN SCHEDULER"
+		self.interval.print_def_interval()
 
 	def decision(self, cpu=None):
 
 		if cpu is None:
 			cpu = self.processors[0]
 		cpu.resched()
+		print "Timer Activation"
 		self.slot_boundary = 1
 
 	def on_activate(self, job):
@@ -41,6 +44,7 @@ class SlotShifting(Scheduler):
 			2. run acceptance and guarantee
 			3. run EDF on ready_list
 		"""
+		print "Schedule"
 		if self.slot_boundary == 1:
 			self.slot_boundary = 0
 		else:

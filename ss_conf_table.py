@@ -111,6 +111,28 @@ class association:
 				)
 		return 0
 
+	def __get_intrfrm_id(self, intr, intr_id):
+		intr_list = intr.intr_list
+		i  = intr_list.go_nxt(None)
+		while i != None:
+			data = intr_list.get_data(i)
+			if data.id == intr_id:
+				return i
+			i = intr_list.go_nxt(i)
+		print "Error: No interval with {} found".format(intr_id)
+		return None
+
+	def __task_intr_asco(self, intr, tsk_intr_lst, tskintrcnt, intr_asco):
+		i = 1
+		for a in intr_asco:
+			intr_node = self.__get_intrfrm_id(intr, a)
+			if intr_node == None:
+				print "Error: Abort System"
+				return -1
+			tsk_intr_lst.append_node(i, intr_node, a)
+			i += 1
+		return 0
+
 	@staticmethod
 	def __create_deferred_intr_list(self, interval):
 		i = 0
@@ -135,16 +157,15 @@ class association:
 				break
 			else:
 				lent_till = node
-		#node = interval.goto_prev_interval(1)
-		#if node == None:
-		#	print "Error: lent till node is empty"
-		#	return
 		while 1:
 			data = interval.goto_prev_interval(None)
 			if data == None:
 				print "moved to head"
 				return
 			data.set_lent_till(lent_till)
+			d = data.lent_till
+			dt = d.get_data() 
+			print "lent_till {}".format(dt.id)
 			if data.sc >= 0:
 				break
 			data.set_lender(lent_node)
@@ -189,13 +210,15 @@ class association:
 		"""
 		self.__create_deferred_intr_list(self, interval)
 		self.__create_interval_relation(interval)
-		print "===============printing deferred interval==================="	
+
+		print "============printing deferred interval============="
 		interval.print_def_interval()
+
 	"""
 	Creates deferred_interval object 
 	"""
 	@staticmethod
-	def create_intr_list(self):
+	def create_def_intr_list(self):
 		i = deferred_interval()
 		while self.intr_idx < self.rcvr.intr_cnt:
 			intr = self.rcvr.intr[self.intr_idx]
@@ -208,27 +231,6 @@ class association:
 
 		return i
 
-	def __get_intrfrm_id(self, intr, intr_id):
-		intr_list = intr.intr_list
-		i  = intr_list.go_nxt(None)
-		while i != None:
-			data = intr_list.get_data(i)
-			if data.id == intr_id:
-				return i
-			i = intr_list.go_nxt(i)
-		print "Error: No interval with {} found".format(intr_id)	
-		return None
-
-	def __task_intr_asco(self, intr, tsk_intr_lst, tskintrcnt, intr_asco):
-		i = 1
-		for a in intr_asco:
-			intr_node = self.__get_intrfrm_id(intr, a)
-			if intr_node == None:
-				print "Error: Abort System"
-				return -1
-			tsk_intr_lst.append_node(i, intr_node, a)
-			i += 1
-		return 0
 """
 class client:
 	def __init__(self):

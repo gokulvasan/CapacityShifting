@@ -68,19 +68,29 @@ class locallist:
 		return node.get_prev()
 	def get_head(self):
 		return self.head
-"""
+
 i = locallist()
 i.append(1)
 i.append(2)
 i.append(3)
+i.append(4)
 n = i.go_nxt(None)
 print i.get_data(n)
 n = i.go_nxt(n)
 print i.get_data(n)
-i.insert(n,5)
+#i.insert(n,5)
+#n = i.go_nxt(n)
+print i.get_data(n)
 n = i.go_nxt(n)
 print i.get_data(n)
+n = i.go_nxt(n)
+print i.get_data(n)
+
 # print i.get_data(None)
-n = i.go_nxt(n)
+print "moving prev"
+n = i.go_prev(n)
 print i.get_data(n)
-"""
+n = i.go_prev(n)
+print i.get_data(n)
+n = i.go_prev(n)
+print i.get_data(n)
