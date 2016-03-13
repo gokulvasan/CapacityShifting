@@ -64,6 +64,7 @@ static int simso_exit(struct platform *self, int exit_code)
 		perror("platform fails");
 		exit(exit_code);
 	}
+	free(self);
 	return 0;
 }
 
