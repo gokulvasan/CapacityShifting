@@ -3,6 +3,7 @@
 *.ko
 *.obj
 *.elf
+*.O
 
 # Precompiled Headers
 *.gch
@@ -29,6 +30,12 @@
 *.hex
 
 # swp
-.*.*.swp
-.*.*.swo
+.*.swp
+.*.swo
+
+# python JITC
+*.pyc
+
+# vim
+*.vim
 
