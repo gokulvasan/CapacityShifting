@@ -71,7 +71,8 @@ class task_data:
 		"""
 		self.intr_list = intr_list
 		self.intr_count = length
- 
+	
+	# this needs to be called on each job activation. 
 	def set_current_job(self, j_no):
 		if None == self.intr_list:
 			print "error: intr_list is empty"
@@ -79,7 +80,7 @@ class task_data:
 
 		l = self.intr_list.get_node(self.curr_index)
 		if l.j_no > j_no:
-			print "Error: wrong job interation"
+			print "Error: wrong job iteration"
 			return -1
 		elif l.j_no == j_no:
 			return 0
@@ -92,11 +93,14 @@ class task_data:
 	@property
 	def curr_intr(self):
 		l = self.intr_list.get_node(self.curr_index)
-		return l.interval
+		if l != None:
+			return l.interval
+		return None
+
 	@property
 	def tsk_type(self):
 		return self.tsk_type
-	
+
 	# This needs a better abstraction later
 	def set_tsk_data(self, data, task):
 		task._task_info.data = data

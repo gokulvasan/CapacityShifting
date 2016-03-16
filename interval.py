@@ -165,6 +165,14 @@ class interval(object):
 
 	def intr_list(self):
 		return self.intr_list
+	
+	def check_set_curr_interval(self, time_progressed):
+		if time_progressed >= self.curr_interval.end:
+			curr_intr = self.goto_nxt_interval(None)
+			if None == curr_intr:
+				return None
+			self.set_curr_interval(curr_intr)
+		return 0
 
 	def update_intr(self, time_progressed, task): 
 		"""
@@ -177,14 +185,12 @@ class interval(object):
 				progress the current interval
 			2. update_sc
 		"""
-		if time_progressed >= self.curr_interval.end:
-			curr_intr = self.goto_nxt_interval(None)
-			if curr_intr == None
-				return None
-			self.set_curr_interval(curr_intr)
+		if 0 != self.check_set_curr_interval(time_progressed):
+			return None
 
-		self.update_sc(task.data)
-
+		if -1 == self.update_sc(task.data)
+			return None
+		return 1
 	def update_sc(self, task_data):
 		"""
 		Original update_sc
@@ -298,10 +304,10 @@ class interval(object):
 				if intr_iterator.sc >= delta:
 					intr_iterator.sc = intr_iterator.sc - delta
 					delta = 0
-				else
+				else:
 					delta = delta - intr_iterator.sc
 					intr_iterator.sc = -delta
-			else
+			else:
 				intr_iterator.sc += -delta
 			
 			intr_iterator = goto_prev_interval(None)
@@ -330,22 +336,78 @@ class interval(object):
 	Basically I will try to use composition method to add 
 	additional data to existing data.
 """
-
 class deferred_interval(interval):
 	def __init__(self):
 		super(deferred_interval, self).__init__()
 		print "creating deferred interval"
 
-	def update_sc(self, curr_intr, task):
+	def update_sc(self, time_progressed , task):
 		"""
 		Simply update slots, O(1) 
 		"""
-		pass
+		task_data = task.data
+		intr_task = task_data.curr_intr
+		if None == intr_task:
+			print "Error: task intr association failure"
+			return -1
+		intr_task_data = intr_task.get_data()
+		if  self.curr_interval == intr_task_data:
+			return 0
 
-	def  goto_nxt_interval(self, data_type):
-		pass
-	def set_curr_interval(self):
-		pass
+		if intr_task_data.sc < 0:
+			intr_task_data.set_update_val(intr_task_data.update_val + 1)
+ 
+		intr_task_data.set_sc(intr_task_data.sc + 1)
+		if self.curr_interval.lender == intr_task_data.lender:
+			return 0
+
+		self.curr_interval.set_sc(self.curr_interval.sc - 1)
+		return 0
+	def deferred_update(self, curr_intr):
+		"""
+			1. iterate backwards and update all SC till we reach
+			the interval which will be the current interval.
+			2. along update REC val
+			3. return SC of the current interval.
+		"""
+		if None == curr_intr.lent_till:
+			return None
+		if None == curr_intr.lender:
+			print "Error: lender is empty, lent-till exists"
+			return -1
+
+		ith_intr = curr_intr.lent_till
+		ith_intr_data = ith_intr.get_data()
+		self.set_iterator(ith_intr)
+		rec_val = 0
+		while 1:
+			update_val += ith_intr_data.update_val
+			ith_intr_data.set_update_val(0)
+			ith_intr_data = goto_prev_interval(None)
+			ith_intr_data.sc = (ith_intr_data.sc - rec_val) 
+			if ith_intr_data == curr_data
+				break
+			ith_intr_data.sc += update_val
+			rec_val += max(0, ith_intr_data.sc)
+		return 1
+ 
+	def check_set_curr_interval(self, time_progressed):
+		"""
+		this should be a atomic function which does the following
+		in sequence:
+			2. do deferred update
+			3. set the current interval.
+		"""
+		if time_progressd >= self.curr_interval.end:
+			if -1 == self.deferred_update(self.curr_interval)
+				return -1
+			curr_intr = self.goto_nxt_interval(None)
+			if None == curr_intr:
+				return None
+
+			self.set_curr_interval(curr_intr)
+		return 0
+
 	def print_def_interval(self):
 		i = 0
 		node = None
@@ -354,6 +416,7 @@ class deferred_interval(interval):
 			data = self.intr_list.get_data(node)
 			self.__print_intr(data)
 			i += 1
+
 	def __print_intr(self, node):
 		print "======{}=====".format(node)
 		print "intr_id{}".format(node.id)

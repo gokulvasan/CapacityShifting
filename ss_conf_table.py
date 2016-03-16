@@ -166,10 +166,9 @@ class association:
 			d = data.lent_till
 			dt = d.get_data() 
 			print "lent_till {}".format(dt.id)
+			data.set_lender(lent_node)
 			if data.sc >= 0:
 				break
-			data.set_lender(lent_node)
-
 		interval.set_iterator(lent_till)
 		return i
 
@@ -210,7 +209,7 @@ class association:
 		"""
 		self.__create_deferred_intr_list(self, interval)
 		self.__create_interval_relation(interval)
-
+		# here check for the correctness
 		print "============printing deferred interval============="
 		interval.print_def_interval()
 
