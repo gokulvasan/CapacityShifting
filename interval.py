@@ -188,7 +188,7 @@ class interval(object):
 		if 0 != self.check_set_curr_interval(time_progressed):
 			return None
 
-		if -1 == self.update_sc(task.data)
+		if -1 == self.update_sc(task.data):
 			return None
 		return 1
 	def update_sc(self, task_data):
@@ -210,8 +210,8 @@ class interval(object):
 			tmp = self.intr_list.go_prev(tmp)	#else keep iterating backwards
 
 	def Aperiodic_test(self, Atask,time_progressed):
-		curr_iter_point = self.curr_point
-		ret = None
+		curr_iter_point = self.get_curr_iterator()
+		ret = 0
 
 		wcet_time = Atask.wcet
 		wcet_slot = wcet_time / quantum_notion
@@ -220,7 +220,7 @@ class interval(object):
 
 		if self.acceptance_test(wcet_slot, dl_slot):
 			guarantee_task(Atask, wcet_slot, dl_slot, time_progressed)
-			ret = Atask;
+			ret = 1
 
 		self.set_iterator(curr_iter_point)
 		return ret
@@ -385,7 +385,7 @@ class deferred_interval(interval):
 			ith_intr_data.set_update_val(0)
 			ith_intr_data = goto_prev_interval(None)
 			ith_intr_data.sc = (ith_intr_data.sc - rec_val) 
-			if ith_intr_data == curr_data
+			if ith_intr_data == curr_data:
 				break
 			ith_intr_data.sc += update_val
 			rec_val += max(0, ith_intr_data.sc)
@@ -399,7 +399,7 @@ class deferred_interval(interval):
 			3. set the current interval.
 		"""
 		if time_progressd >= self.curr_interval.end:
-			if -1 == self.deferred_update(self.curr_interval)
+			if -1 == self.deferred_update(self.curr_interval):
 				return -1
 			curr_intr = self.goto_nxt_interval(None)
 			if None == curr_intr:
