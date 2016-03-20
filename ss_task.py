@@ -71,7 +71,20 @@ class task_data:
 		"""
 		self.intr_list = intr_list
 		self.intr_count = length
-	
+		self.state = -1	
+	@property
+	def curr_intr(self):
+		l = self.intr_list.get_node(self.curr_index)
+		if l != None:
+			return l.interval
+		return None
+	@property
+	def curr_state(self):
+		return self.state
+	@property
+	def tsk_type(self):
+		return self.tsk_type
+
 	# this needs to be called on each job activation. 
 	def set_current_job(self, j_no):
 		if None == self.intr_list:
@@ -90,17 +103,6 @@ class task_data:
 			if self.curr_index >= self.intr_count:
 				return 1
 			return 0
-	@property
-	def curr_intr(self):
-		l = self.intr_list.get_node(self.curr_index)
-		if l != None:
-			return l.interval
-		return None
-
-	@property
-	def tsk_type(self):
-		return self.tsk_type
-
 	# This needs a better abstraction later
 	def set_tsk_data(self, data, task):
 		task._task_info.data = data
