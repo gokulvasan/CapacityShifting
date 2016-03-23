@@ -1,11 +1,12 @@
 from simso.core import Scheduler, Timer
+from ss_state_machine import state
 
 class SlotShifting(Scheduler):
 
 	def init(self):
-		self.ready_list = []
-		self.unconcluded_lst = []
-		self.not_guaranteed_lst = []
+		#self.ready_list = []
+		#self.unconcluded_lst = []
+		#self.not_guaranteed_lst = []
 		self.interval = self.data
 		self.curr_job = None
 		self.slot_boundary = 0
@@ -16,6 +17,7 @@ class SlotShifting(Scheduler):
 		self.slot_timer.start()
 		print " IN SCHEDULER"
 		self.interval.print_def_interval()
+		self.state = state()
 
 	def decision(self, cpu=None):
 
@@ -33,7 +35,8 @@ class SlotShifting(Scheduler):
 			4. else to ready_list
 		"""
 		print "job got activated"
-		self.ready_list.append(job)
+		# self.ready_list.append(job)
+		self.state.add_job(job)
 
 	def on_deactivate(self, job):
 		self.ready_list.remove(job)

@@ -1,7 +1,7 @@
 
 from simso.core import Scheduler
 import ss_list
-from ss_task import task_data
+from ss_task import task_data, tsk_type
 from ss_task import task_intr_association
 
 class deferred_intr_node:
@@ -199,7 +199,7 @@ class interval(object):
 		sc = self.curr_interval.sc
 		self.curr_interval.set_sc(sc-1)
 		while 1:
-			if 2 == task_data.tsk_type: 		#softAper
+			if tsk_type.soft_aperiodic.value == task_data.tsk_type:  #softAper
 				break
 			intr = tmp.get_data()
 			intr.set_sc(intr.sc + 1)

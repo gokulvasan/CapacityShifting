@@ -1,4 +1,11 @@
 from simso.core.Task import GenericTask
+from enum import Enum
+
+class tsk_type(Enum):
+	periodic = 0
+	firm_aperiodic = 1
+	soft_aperiodic = 2
+	firm_aperiodic_g = 3
 
 """
 Class for a interval node of interval list
