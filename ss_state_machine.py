@@ -31,9 +31,7 @@ class just_arrived(state_node):
 	def test(self):
 		print "JA Works"
 	def enter(self, val):
-		task = val.task
-		data = task.data
-
+		data = val.task.data
 		if (tsk_type.periodic.value  == data.tsk_type or
 			tsk_type.firm_aperiodic_g.value == data.tsk_type):
 			return tsk_state.guarantee.value
@@ -73,7 +71,7 @@ class guaranteed(state_node):
 		tsktype = val.task.data.tsk_type
 		if (tsk_type.periodic.value == tsktype or
 			tsk_type.firm_aperiodic_g.value == tsktype):
-			return super(not_guaranteed, self).enter(val)
+			return super(guaranteed, self).enter(val)
 		return -1
 
 class running(state_node):
