@@ -79,6 +79,12 @@ class running(state_node):
 		super(running, self).__init__(curr_list(), 3, 16)
 		print "running init"
 
+"""
+Only 3 functions are exposed to outer world.
+	1. add_job
+	2. transit_unconcluded_task
+	3. selection_function.
+"""
 class state:
 	def __init__(self):
 		self.__st=[]
@@ -87,6 +93,7 @@ class state:
 		self.__st.insert(tsk_state.not_guarantee.value, not_guaranteed())
 		self.__st.insert(tsk_state.guarantee.value, guaranteed())
 		self.__st.insert(tsk_state.running.value, running())
+
 	def __check_transition(self, curr_state, nxt_state):
 		if curr_state == -1:
 			return 1
@@ -104,6 +111,13 @@ class state:
 			ret =  self.__st[nxt_state].enter(job)
 			tsk_data.curr_state = nxt_state
 		return ret
+
+	def rmv_job(self, job):
+		data = job.task.data
+		if tsk_type.soft_aperiodic.value == data.tsk_type:
+			self.__st[tsk_state.not_guarantee.value].exit(job)
+		else:
+			self.__st[tsk_state.guarantee.value].exit(job)
 
 	def add_job(self, job):
 		tsk_data = job.task.data

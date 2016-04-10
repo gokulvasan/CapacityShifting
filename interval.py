@@ -3,6 +3,7 @@ from simso.core import Scheduler
 import ss_list
 from ss_task import task_data, tsk_type
 from ss_task import task_intr_association
+from ss_state_machine import tsk_state
 
 class deferred_intr_node:
 	def __init__(self, deferred_update, interval_node):
@@ -209,9 +210,9 @@ class interval(object):
 				break
 			tmp = self.intr_list.go_prev(tmp)	#else keep iterating backwards
 
-	def Aperiodic_test(self, Atask,time_progressed):
+	def aperiodic_test(self, Atask,time_progressed):
 		curr_iter_point = self.get_curr_iterator()
-		ret = 0
+		ret = tsk_state.not_guarantee.value
 
 		wcet_time = Atask.wcet
 		wcet_slot = wcet_time / quantum_notion
@@ -220,7 +221,7 @@ class interval(object):
 
 		if self.acceptance_test(wcet_slot, dl_slot):
 			guarantee_task(Atask, wcet_slot, dl_slot, time_progressed)
-			ret = 1
+			ret = tsk_state.guarantee.value
 
 		self.set_iterator(curr_iter_point)
 		return ret
@@ -340,7 +341,7 @@ class deferred_interval(interval):
 	def __init__(self):
 		super(deferred_interval, self).__init__()
 		print "creating deferred interval"
-
+		
 	def update_sc(self, time_progressed , task):
 		"""
 		Simply update slots, O(1) 
@@ -398,7 +399,7 @@ class deferred_interval(interval):
 			2. do deferred update
 			3. set the current interval.
 		"""
-		if time_progressd >= self.curr_interval.end:
+		if time_progressed >= self.curr_interval.end:
 			if -1 == self.deferred_update(self.curr_interval):
 				return -1
 			curr_intr = self.goto_nxt_interval(None)
