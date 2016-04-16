@@ -49,7 +49,7 @@ class reciever:
 			intr_node = self.__recv(intr_fmt)
 			self.intr.append(intr_node)
 			i = i + 1
-
+		
 	def __recv(self, fmt):
 		data = self.__sock.recv(256)
 		r = struct.pack('I', len(data))
@@ -93,10 +93,11 @@ class association:
 
 		tskid = tsk[0]
 		tskest = tsk[1]
-		tskwcet = tsk[2]
-		tskdl = tsk[3]
-		tskperiod = tsk[4]
+		tskwcet = tsk[2] * 5
+		tskdl = tsk[3] * 5
+		tskperiod = tsk[4] * 5
 		tskintrcnt = tsk[5]
+		print " ====== TASK id{} est{} wcet{} dl{} prd{} =====".format(tskid, tskest, tskwcet, tskdl, tskperiod)
 		tsk_intr_asco = task_intr_association()
 		i = self.__task_intr_asco(intr_list, tsk_intr_asco, 
 						tskintrcnt, tsk[6:])
@@ -199,6 +200,7 @@ class association:
 				print " SC < 0"
 			else:
 				i += 1
+		interval.reset_iterator()
 	@staticmethod
 	def create_relation_window(self, interval):
 		"""
@@ -212,7 +214,10 @@ class association:
 		# here check for the correctness
 		print "============printing deferred interval============="
 		interval.print_def_interval()
-
+		print "==========setting CURRENT INTR"
+		curr_intr = interval.goto_nxt_interval(1)
+		interval.set_curr_interval(curr_intr.get_data())
+		interval.set_iterator(curr_intr)	
 	"""
 	Creates deferred_interval object 
 	"""
@@ -227,7 +232,7 @@ class association:
 		print "=============NOW REVERSING==========="
 		i.intr_reverse()
 		i.print_intr_list()
-
+		
 		return i
 
 """

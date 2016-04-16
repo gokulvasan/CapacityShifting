@@ -56,19 +56,16 @@ class chronos(Timer):
 		self.sim = sim
 		super(chronos, self).__init__( self.sim, chronos.decision,
 					(self, ), self.time.nxt_decn,
-					in_ms=True, one_shot=True, cpu=self.cpu)
+					in_ms=False, one_shot=True, cpu=self.cpu)
 		self.start()
 
 	def decision(self, cpu=None):
 		if cpu is None:
 			proc_id = self.cpu
-
-		print "Timer Activation"
-		
 		self.time.update_curr_time()
 		self.time.set_decn()
 		self.delay = self.time.nxt_decn
-
+		print "Timer Activation : nxt{} curr{}".format(self.delay, self.get_curr_time)
 		self.start()
 		proc_id.resched()
 
@@ -84,7 +81,7 @@ class chronos(Timer):
 			self.time.reset_decn()
 			return 1
 		return 0
-
+	@property
 	def get_curr_time(self):
 		return self.time.curr_time
 

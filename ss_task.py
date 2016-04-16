@@ -81,6 +81,8 @@ class task_data:
 		self.state = -1	
 	@property
 	def curr_intr(self):
+		if self.curr_index >= self.intr_count:
+			return None 
 		l = self.intr_list.get_node(self.curr_index)
 		if l != None:
 			return l.interval
@@ -94,28 +96,33 @@ class task_data:
 
 	# this needs to be called on each job activation. 
 	def set_current_job(self, j_no):
+
 		if None == self.intr_list:
 			print "error: intr_list is empty"
 			return -1
 
+		if self.curr_index >= self.intr_count:
+			return 0
+
+		print "job number {}".format(j_no)
 		l = self.intr_list.get_node(self.curr_index)
 		if l.j_no > j_no:
-			print "Error: wrong job iteration"
+			print "Error: wrng job iter:l.jno{} jno{}".format(l.j_no, j_no)
 			return -1
 		elif l.j_no == j_no:
-			return 0
+			return 1
 		else:
 			self.curr_index = self.curr_index + 1
-			print 'current index {}'.format(self.curr_index)
+			print 'curridx {}'.format(self.curr_index)
 			if self.curr_index >= self.intr_count:
-				return 1
-			return 0
+				return 0
+		return 1
 	# This needs a better abstraction later
 	def set_tsk_data(self, data, task):
 		task._task_info.data = data
 
 	def print_data(self):
-		print "***************"
+		print "********TASK*******"
 		print "tsk_type {}".format(self.tsk_type)
 		print "curr_index{}".format(self.curr_index)
 		print "intr_count {}".format(self.intr_count)

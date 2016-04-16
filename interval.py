@@ -21,9 +21,14 @@ class deferred_intr_node:
 		return self.interval.end
 	@property
 	def sc(self):
+		if self.interval.id == 4:
+			print "getting sc of 4"
+			self.interval.sc = 0
+
 		return self.interval.sc
-	def set_sc(self, sc):
-		self.interval.sc = sc
+	def set_sc(self, val):
+		print "val {} ID {}".format(self.sc, self.id)
+		self.interval.sc = int(val)
 	def set_start(self, start):
 		self.interval.start = start
 	def set_end(self,end):
@@ -62,7 +67,7 @@ class interval_node:
 		self.intr_id = intr_id
 		self.start = start
 		self.end = end
-		self.sc = sc
+		self.sc = int(sc)
 	@property
 	def id(self):
 		return self.intr_id
@@ -74,9 +79,10 @@ class interval_node:
 		return self.end
 	@property
 	def sc(self):
+		print "setting interval"
 		return self.sc
 	def set_sc(self, val):
-		self.sc = val
+		self.sc = int(val)
 	def set_start(self, new_start):
 		self.start = new_start
 	def set_end(self, new_end):
@@ -112,6 +118,7 @@ class interval(object):
 		else:
 			self.curr_point = self.intr_list.go_nxt(self.curr_point)
 			if self.curr_point == self.intr_list.get_head():
+				print "REPEATING HEAD"
 				return None
 		if data_type == None:
 			return self.intr_list.get_data(self.curr_point)
@@ -156,7 +163,10 @@ class interval(object):
 		self.curr_interval = intr
 
 	def get_curr_interval(self):
-		return self.intr_list.get_data(self.curr_interval)
+		#if self.curr_interval:
+		#	return self.intr_list.get_data(self.curr_interval)
+		#return None
+		return self.curr_interval
 
 	def get_intr_count(self):
 		return self.intr_count
@@ -168,7 +178,12 @@ class interval(object):
 		return self.intr_list
 	
 	def check_set_curr_interval(self, time_progressed):
-		if time_progressed >= self.curr_interval.end:
+
+		curr_intr = self.curr_interval
+		if None == curr_intr:
+			return None
+
+		if time_progressed >= curr_intr.end:
 			curr_intr = self.goto_nxt_interval(None)
 			if None == curr_intr:
 				return None
@@ -186,20 +201,33 @@ class interval(object):
 				progress the current interval
 			2. update_sc
 		"""
+		# print "time_progressed {}".format(time_progressed)
+		if task:
+			"""
+			We have reached point of uncertainity so return 
+			"""
+			if None == task.data.curr_intr:
+				return
+
 		if 0 != self.check_set_curr_interval(time_progressed):
 			return None
-
-		if -1 == self.update_sc(task.data):
+		if -1 == self.update_sc(task):
 			return None
 		return 1
-	def update_sc(self, task_data):
+
+	def update_sc(self, task):
 		"""
 		Original update_sc
 		"""
-		tmp = task_data.curr_intr
+		if task:
+			task_data = task.data
+			tmp = task_data.curr_intr
+
 		sc = self.curr_interval.sc
 		self.curr_interval.set_sc(sc-1)
 		while 1:
+			if None == task:
+				break
 			if tsk_type.soft_aperiodic.value == task_data.tsk_type:  #softAper
 				break
 			intr = tmp.get_data()
@@ -252,7 +280,7 @@ class interval(object):
 		new_intr_id = self.intr_count + 1
 		new_intr_end = split_point
 
-		if intr_right == self.get_curr_interval():
+		if intr_right == self.curr_interval:
 			new_intr_start = time_progresed
 		else:	
 			new_intr_start = intr_right.start
@@ -311,16 +339,19 @@ class interval(object):
 			else:
 				intr_iterator.sc += -delta
 			
-			intr_iterator = goto_prev_interval(None)
+			intr_iterator = self.goto_prev_interval(None)
 
 	def print_intr_list(self):
 		i = 0
-		node = None
+		node = None #self.goto_nxt_interval(None)
 		while i < self.intr_count:
 			node = self.intr_list.go_nxt(node)
 			data = self.intr_list.get_data(node)
 			self.__print_intr(data)
+			#node = self.goto_nxt_interval(None)
 			i += 1
+		#self.reset_iterator()
+		#self.goto_nxt_interval(None) # This sets it to head
 
 	def __print_intr(self, node):
 		print "==========="
@@ -341,29 +372,37 @@ class deferred_interval(interval):
 	def __init__(self):
 		super(deferred_interval, self).__init__()
 		print "creating deferred interval"
-		
-	def update_sc(self, time_progressed , task):
+
+	def update_sc(self, task):
 		"""
 		Simply update slots, O(1) 
 		"""
-		task_data = task.data
-		intr_task = task_data.curr_intr
-		if None == intr_task:
-			print "Error: task intr association failure"
-			return -1
-		intr_task_data = intr_task.get_data()
-		if  self.curr_interval == intr_task_data:
-			return 0
+		if task:
+			print "There is a task {}".format(task.identifier)
+			task_data = task.data
+			intr_task = task_data.curr_intr
+			if None == intr_task:
+				print "Error: task intr association failure"
+				return -1
+			intr_task_data = intr_task.get_data()
+			if  self.curr_interval == intr_task_data:
+				print "task belongs to curr interval"
+				return 0
 
-		if intr_task_data.sc < 0:
-			intr_task_data.set_update_val(intr_task_data.update_val + 1)
- 
-		intr_task_data.set_sc(intr_task_data.sc + 1)
-		if self.curr_interval.lender == intr_task_data.lender:
-			return 0
+			if intr_task_data.sc < 0:
+				intr_task_data.set_update_val(intr_task_data.update_val + 1)
+			intr_task_data.set_sc(intr_task_data.sc + 1)
 
-		self.curr_interval.set_sc(self.curr_interval.sc - 1)
+			# ERROR: Here is the error
+			if self.curr_interval.lender == intr_task_data.lender:
+					return 0
+			else:
+				print "Going forward to negate the current interval"
+		#print "before negating SC {}".format(self.curr_interval.sc)
+		self.curr_interval.sc -= 1
+		print " curr interval SC is {} id{}".format(self.curr_interval.sc, self.curr_interval.id)
 		return 0
+
 	def deferred_update(self, curr_intr):
 		"""
 			1. iterate backwards and update all SC till we reach
@@ -371,23 +410,29 @@ class deferred_interval(interval):
 			2. along update REC val
 			3. return SC of the current interval.
 		"""
+		update_val = 0
+		rec_val = 0
+
 		if None == curr_intr.lent_till:
 			return None
 		if None == curr_intr.lender:
 			print "Error: lender is empty, lent-till exists"
 			return -1
-
+		print "deferring interval curr_intr {}".format(curr_intr.id)	
 		ith_intr = curr_intr.lent_till
 		ith_intr_data = ith_intr.get_data()
 		self.set_iterator(ith_intr)
-		rec_val = 0
 		while 1:
+			if ith_intr_data == curr_intr:
+				break
 			update_val += ith_intr_data.update_val
 			ith_intr_data.set_update_val(0)
-			ith_intr_data = goto_prev_interval(None)
-			ith_intr_data.sc = (ith_intr_data.sc - rec_val) 
-			if ith_intr_data == curr_data:
+			ith_intr_data = self.goto_prev_interval(None)
+			if None == ith_intr_data:
+				print "ERRROR in lent till"
 				break
+			print "iterating backwards {}".format(ith_intr_data.id)
+			ith_intr_data.sc = (ith_intr_data.sc - rec_val) 
 			ith_intr_data.sc += update_val
 			rec_val += max(0, ith_intr_data.sc)
 		return 1
@@ -399,14 +444,19 @@ class deferred_interval(interval):
 			2. do deferred update
 			3. set the current interval.
 		"""
-		if time_progressed >= self.curr_interval.end:
-			if -1 == self.deferred_update(self.curr_interval):
-				return -1
+		curr_intr = self.curr_interval
+		if None == curr_intr:
+			return None
+
+		if time_progressed >= curr_intr.end:
+			print "Curr interval {} end{} SC{}".format(curr_intr.id, curr_intr.end, curr_intr.sc)
 			curr_intr = self.goto_nxt_interval(None)
+			self.set_curr_interval(curr_intr)
 			if None == curr_intr:
 				return None
-
-			self.set_curr_interval(curr_intr)
+			print "Moving curr interval to:id {} end{}, time_progress {}".format(curr_intr.id, curr_intr.end, time_progressed)
+			if -1 == self.deferred_update(curr_intr):
+				return -1
 		return 0
 
 	def print_def_interval(self):
@@ -417,7 +467,9 @@ class deferred_interval(interval):
 			data = self.intr_list.get_data(node)
 			self.__print_intr(data)
 			i += 1
-
+			#node = self.goto_nxt_interval(None)
+		#self.set_iterator(self.intr_list.go_nxt(None))
+		#self.reset_iterator()
 	def __print_intr(self, node):
 		print "======{}=====".format(node)
 		print "intr_id{}".format(node.id)

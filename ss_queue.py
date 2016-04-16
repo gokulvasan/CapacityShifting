@@ -6,7 +6,10 @@ class sslist(object):
 		self.q.append(data)
 		return 0
 	def dequeue(self, data):
-		self.q.remove(data)
+		if data in self.q:
+			self.q.remove(data)
+		else:
+			print "data is not in list"
 		return 0
 	@property
 	def data(self):
@@ -19,7 +22,7 @@ class guaranteed_list(sslist):
 	def data(self):
 		if self.q:
 			job = min(self.q,
-				key=lambda x: x.absoulute_deadline)
+				key=lambda x: x.absolute_deadline)
 			if job != None:
 				return job
 		return None
@@ -40,6 +43,7 @@ class unconcluded_list(sslist):
 	@property
 	def data(self):
 		if self.q:
+			# ERROR: here it should dequeue
 			job = self.q.pop(0)
 			return job
 		return None
@@ -47,16 +51,22 @@ class unconcluded_list(sslist):
 class curr_list():
 	def __init__(self):
 		self.curr_job = None
+	
 	def queue(self, data):
 		if self.curr_job:
 			return -1
 		self.curr_job = data
 		return 0
+	@property
+	def data(self):
+		return self.curr_job
+
 	def dequeue(self, data):
-		if ( None == self.curr_task or
-			data != self.curr_tsk) :
+		"""if ( None == self.curr_job or
+			data != self.curr_job) :
 			return -1
-		self.curr_task = None
+		"""
+		self.curr_job = None
 		return 0
 
 """
