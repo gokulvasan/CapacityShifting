@@ -32,10 +32,10 @@ class just_arrived(state_node):
 		print "JA Works"
 	def enter(self, val):
 		data = val.task.data
-		print "tsk type {}".format(data.tsk_type)
+		#print "tsk type {}".format(data.tsk_type)
 		if (tsk_type.periodic.value  == data.tsk_type or
 			tsk_type.firm_aperiodic_g.value == data.tsk_type):
-			print "job is guarantee"
+			#print "job is guarantee"
 			return tsk_state.guarantee.value
 		elif tsk_type.firm_aperiodic.value == data.tsk_type:
 			return tsk_state.unconcluded.value
@@ -84,7 +84,7 @@ class running(state_node):
 	"""def check(self, job):
 		if self.exit(job) < 0:
 			return 0
-		print " job is current"
+		# print " job is current"
 		return 1
 	"""
 """
@@ -114,7 +114,7 @@ class state:
 	def __change_state(self, job, nxt_state):
 		ret = -1
 		tsk_data = job.task.data
-		print "CURR STATE{} NXT STATE {}".format(tsk_data.curr_state, nxt_state)
+		#print "CURR STATE{} NXT STATE {}".format(tsk_data.curr_state, nxt_state)
 		if self.__check_transition(tsk_data.curr_state, nxt_state):
 			if tsk_data.curr_state >= 0:
 				if self.__st[tsk_data.curr_state].exit(job) < 0:
@@ -125,10 +125,10 @@ class state:
 
 	def rmv_job(self, job):
 		data = job.data
-	data.curr_state = tsk_state.exit.value 
+		data.curr_state = tsk_state.exit.value 
 		curr_job = self.__st[tsk_state.running.value].queue.data
 		if curr_job == job:
-			print " removing current job"
+			#print " removing current job"
 			self.__st[tsk_state.running.value].exit(job)
 			return
 		if tsk_type.soft_aperiodic.value == data.tsk_type:
@@ -142,7 +142,7 @@ class state:
 		nxt_state =self.__change_state(job,
 					 tsk_state.just_arrived.value)
 		if nxt_state >= 0:
-			print "Adding {} to state {}".format(job.name, nxt_state)
+			# print "Adding {} to state {}".format(job.name, nxt_state)
 			return self.__change_state(job, nxt_state)
 		return -1
 
@@ -170,11 +170,10 @@ class state:
 		"""
 		prev_job = self.__st[tsk_state.running.value].queue.data 
 		if prev_job:
-			print "prev job {}".format(prev_job.name)
+			#print "prev job {}".format(prev_job.name)
 			prev_tsk_type = prev_job.task.data.tsk_type
 			if (tsk_type.periodic.value == prev_tsk_type or
 			tsk_type.firm_aperiodic_g.value == prev_tsk_type):
-				print " moving task back to guarantee"
 				self.__change_state(prev_job,
 					tsk_state.guarantee.value)
 			elif( tsk_type.soft_aperiodic.value == prev_tsk_type):
@@ -188,7 +187,7 @@ class state:
 			job = self.__st[tsk_state.not_guarantee.value].queue.data
 		if None != job:
 			self.__change_state(job, tsk_state.running.value)
-			print " Selected job {}".format(job.name)
+			#print " Selected job {}".format(job.name)
 		return job
 
 """

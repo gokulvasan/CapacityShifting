@@ -20,16 +20,16 @@ class SlotShifting(Scheduler):
 			4. else to ready_list
 			5. iterate job's list
 		"""
-		print "job got activated {}".format(job.name)
+		#print "job got activated {}".format(job.name)
 		if job.task.data.set_current_job(job.task._job_count) > 0:
-			print "Active job in list"
+			#print "Active job in list"
 			if self.state.add_job(job) < 0:
 				print "Adding job Failed"
 		else:
 			print "job cannot be added as certainity ended"
 
 	def on_terminated(self, job):
-		print "job terminated {}".format(job.name)
+		#print "job terminated {}".format(job.name)
 		self.state.rmv_job(job)
 
 	def schedule(self, cpu):
@@ -49,8 +49,9 @@ class SlotShifting(Scheduler):
 			print("selected job : %s %.3f ms" % (self.curr_job.name, self.curr_job.computation_time))
 			tsk = self.curr_job.task
 		else:
+			print "selected job is None"
 			tsk = None
 
-		# self.interval.update_intr(self.time.get_curr_time, tsk)
+		self.interval.update_intr(self.time.get_curr_time, tsk)
 
 		return (self.curr_job, self.processors[0])		

@@ -104,7 +104,7 @@ class task_data:
 		if self.curr_index >= self.intr_count:
 			return 0
 
-		print "job number {}".format(j_no)
+		#print "job number {}".format(j_no)
 		l = self.intr_list.get_node(self.curr_index)
 		if l.j_no > j_no:
 			print "Error: wrng job iter:l.jno{} jno{}".format(l.j_no, j_no)
@@ -113,7 +113,7 @@ class task_data:
 			return 1
 		else:
 			self.curr_index = self.curr_index + 1
-			print 'curridx {}'.format(self.curr_index)
+			#print 'curridx {}'.format(self.curr_index)
 			if self.curr_index >= self.intr_count:
 				return 0
 		return 1
