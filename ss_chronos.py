@@ -25,7 +25,7 @@ class time_progress_discrete(time_progress):
 	
 	def __init__(self, time):
 		time_progress.__init__(self, time)	
-		self.slot_count = 0
+		self.slot_count = -1
 		self.slot_boundary = 1
 
 	@property
