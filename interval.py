@@ -21,13 +21,8 @@ class deferred_intr_node:
 		return self.interval.end
 	@property
 	def sc(self):
-		if self.interval.id == 4:
-			print "getting sc of 4"
-			self.interval.sc = 0
-
 		return self.interval.sc
 	def set_sc(self, val):
-		print "val {} ID {}".format(self.sc, self.id)
 		self.interval.sc = int(val)
 	def set_start(self, start):
 		self.interval.start = start
@@ -378,35 +373,43 @@ class deferred_interval(interval):
 		Simply update slots, O(1) 
 		"""
 		if task:
-			print "There is a task {}".format(task.identifier)
 			task_data = task.data
 			intr_task = task_data.curr_intr
 			if None == intr_task:
 				print "Error: task intr association failure"
 				return -1
+
 			intr_task_data = intr_task.get_data()
+			print "taskID {}-INTR{},SC{} & CURR_INTR{}".format(task.identifier, intr_task_data.id, intr_task_data.sc, self.curr_interval.id)
 			if  self.curr_interval == intr_task_data:
 				print "task belongs to curr interval"
 				return 0
 
 			if intr_task_data.sc < 0:
+				print "task intr is negative so updating updat-val"
 				intr_task_data.set_update_val(intr_task_data.update_val + 1)
 			intr_task_data.set_sc(intr_task_data.sc + 1)
 
 			# ERROR: Here is the error
-			if self.curr_interval.lender == intr_task_data.lender:
-					return 0
+			if ( (None == self.curr_interval.lender) 
+				or (None == intr_task_data.lender) ):
+				print " GOING forward to negate"
+				pass
+			elif ( (self.curr_interval.lender == intr_task_data.lender) and 
+				(intr_task_data.sc < 0)):
+				print "task lender is current interval and negative"	
+				return 0
 			else:
-				print "Going forward to negate the current interval"
-		#print "before negating SC {}".format(self.curr_interval.sc)
+				print "GOING forward to negate the current interval"
+		print "BFORE: negating SC {} ID{}".format(self.curr_interval.sc, self.curr_interval.id)
 		self.curr_interval.sc -= 1
-		print " curr interval SC is {} id{}".format(self.curr_interval.sc, self.curr_interval.id)
+		print " AFTER: curr interval SC is {} id{}".format(self.curr_interval.sc, self.curr_interval.id)
 		return 0
 
 	def deferred_update(self, curr_intr):
 		"""
 			1. iterate backwards and update all SC till we reach
-			the interval which will be the current interval.
+			   the interval which will be the current interval.
 			2. along update REC val
 			3. return SC of the current interval.
 		"""
@@ -418,7 +421,7 @@ class deferred_interval(interval):
 		if None == curr_intr.lender:
 			print "Error: lender is empty, lent-till exists"
 			return -1
-		print "deferring interval curr_intr {}".format(curr_intr.id)	
+		print "BEFORE: deferring interval curr_intr{} SC{}".format(curr_intr.id, curr_intr.sc)	
 		ith_intr = curr_intr.lent_till
 		ith_intr_data = ith_intr.get_data()
 		self.set_iterator(ith_intr)
@@ -431,10 +434,13 @@ class deferred_interval(interval):
 			if None == ith_intr_data:
 				print "ERRROR in lent till"
 				break
-			print "iterating backwards {}".format(ith_intr_data.id)
+			print "MOVING BAK:ith_intr ID:{}SC:{}".format(ith_intr_data.id, ith_intr_data.sc)
 			ith_intr_data.sc = (ith_intr_data.sc - rec_val) 
 			ith_intr_data.sc += update_val
+			
 			rec_val += max(0, ith_intr_data.sc)
+			print "REC VAL{}".format(rec_val)
+		print "AFTER: curr_intr{}: SC{}".format(curr_intr.id, curr_intr.sc)
 		return 1
  
 	def check_set_curr_interval(self, time_progressed):
@@ -449,14 +455,16 @@ class deferred_interval(interval):
 			return None
 
 		if time_progressed >= curr_intr.end:
+			print "============MOVING TO NXT INTR: START==============="
 			print "Curr interval {} end{} SC{}".format(curr_intr.id, curr_intr.end, curr_intr.sc)
 			curr_intr = self.goto_nxt_interval(None)
 			self.set_curr_interval(curr_intr)
 			if None == curr_intr:
 				return None
-			print "Moving curr interval to:id {} end{}, time_progress {}".format(curr_intr.id, curr_intr.end, time_progressed)
+			print "Moving curr interval to:id {} SC{} end{}, time_progress {}".format(curr_intr.id, curr_intr.sc, curr_intr.end, time_progressed)
 			if -1 == self.deferred_update(curr_intr):
 				return -1
+			print "=====================MOVING TO NXT INTR: END=========="
 		return 0
 
 	def print_def_interval(self):
