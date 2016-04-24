@@ -206,7 +206,7 @@ class interval(object):
 
 		if 0 != self.check_set_curr_interval(time_progressed):
 			return None
-		if -1 == self.update_sc(task):
+		if self.update_sc(task) < 0:
 			return None
 		return 1
 
@@ -380,15 +380,17 @@ class deferred_interval(interval):
 				return -1
 
 			intr_task_data = intr_task.get_data()
-			print "taskID {}-INTR{},SC{} & CURR_INTR{}".format(task.identifier, intr_task_data.id, intr_task_data.sc, self.curr_interval.id)
+			print "taskID {}-INTR{},SC{} & CURR_INTR{}".format(task.identifier, 
+					intr_task_data.id, intr_task_data.sc, self.curr_interval.id)
 			if  self.curr_interval == intr_task_data:
 				print "task belongs to curr interval"
 				return 0
 
+			tsk_intr_sc = intr_task_data.sc
 			if intr_task_data.sc < 0:
 				print "task intr is negative so updating updat-val"
-				intr_task_data.set_update_val(intr_task_data.update_val + 1)
-			intr_task_data.set_sc(intr_task_data.sc + 1)
+				intr_task_data.update_val += 1 
+			intr_task_data.sc += 1
 
 			# ERROR: Here is the error
 			if ( (None == self.curr_interval.lender) 
@@ -396,11 +398,12 @@ class deferred_interval(interval):
 				print " GOING forward to negate"
 				pass
 			elif ( (self.curr_interval.lender == intr_task_data.lender) and 
-				(intr_task_data.sc < 0)):
+				(tsk_intr_sc < 0)):
 				print "task lender is current interval and negative"	
 				return 0
 			else:
 				print "GOING forward to negate the current interval"
+
 		print "BFORE: negating SC {} ID{}".format(self.curr_interval.sc, self.curr_interval.id)
 		self.curr_interval.sc -= 1
 		print " AFTER: curr interval SC is {} id{}".format(self.curr_interval.sc, self.curr_interval.id)
@@ -415,33 +418,33 @@ class deferred_interval(interval):
 		"""
 		update_val = 0
 		rec_val = 0
-
 		if None == curr_intr.lent_till:
-			return None
+			return 0
 		if None == curr_intr.lender:
 			print "Error: lender is empty, lent-till exists"
 			return -1
+
 		print "BEFORE: deferring interval curr_intr{} SC{}".format(curr_intr.id, curr_intr.sc)	
 		ith_intr = curr_intr.lent_till
 		ith_intr_data = ith_intr.get_data()
 		self.set_iterator(ith_intr)
+
 		while 1:
-			if ith_intr_data == curr_intr:
-				break
+			prev_sc = ith_intr_data.sc
+			ith_intr_data.sc += (update_val - rec_val)
+			if ((prev_sc < 0) and (ith_intr_data != curr_intr.lent_till)):
+				rec_val += max(0, ith_intr_data.sc)
+			else:
+				rec_val = update_val
+
 			update_val += ith_intr_data.update_val
-			ith_intr_data.set_update_val(0)
+			ith_intr_data.update_val = 0
+			if ith_intr_data == curr_intr:
+				break 
 			ith_intr_data = self.goto_prev_interval(None)
-			if None == ith_intr_data:
-				print "ERRROR in lent till"
-				break
-			print "MOVING BAK:ith_intr ID:{}SC:{}".format(ith_intr_data.id, ith_intr_data.sc)
-			ith_intr_data.sc = (ith_intr_data.sc - rec_val) 
-			ith_intr_data.sc += update_val
-			
-			rec_val += max(0, ith_intr_data.sc)
-			print "REC VAL{}".format(rec_val)
+		print "UPDATE{} REC{}".format(update_val, rec_val)
 		print "AFTER: curr_intr{}: SC{}".format(curr_intr.id, curr_intr.sc)
-		return 1
+		return rec_val 
  
 	def check_set_curr_interval(self, time_progressed):
 		"""
@@ -457,13 +460,16 @@ class deferred_interval(interval):
 		if time_progressed >= curr_intr.end:
 			print "============MOVING TO NXT INTR: START==============="
 			print "Curr interval {} end{} SC{}".format(curr_intr.id, curr_intr.end, curr_intr.sc)
-			curr_intr = self.goto_nxt_interval(None)
-			self.set_curr_interval(curr_intr)
-			if None == curr_intr:
+			nxt_curr_intr = self.goto_nxt_interval(None)
+			self.set_curr_interval(nxt_curr_intr)
+			if None == nxt_curr_intr:
 				return None
-			print "Moving curr interval to:id {} SC{} end{}, time_progress {}".format(curr_intr.id, curr_intr.sc, curr_intr.end, time_progressed)
-			if -1 == self.deferred_update(curr_intr):
-				return -1
+			print "Moving curr interval to:id {} SC{} end{}, time_progress {}".format(nxt_curr_intr.id, nxt_curr_intr.sc, nxt_curr_intr.end, time_progressed)
+			rec = self.deferred_update(nxt_curr_intr)
+			if curr_intr.lent_till == nxt_curr_intr.lent_till:
+				curr_intr.sc -= rec
+
+			print "After correction Prev interval:{}".format(curr_intr.sc)
 			print "=====================MOVING TO NXT INTR: END=========="
 		return 0
 
