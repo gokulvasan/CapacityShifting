@@ -34,8 +34,8 @@ class reciever:
 		tsk_var_data_fmt = "I"
 		while(i < self.tsk_cnt):
 			hdr_data = self.__recv(tsk_hdr_fmt)
-			tsk_fmt = self.__createUnpackString(tsk_const_data_fmt, 
-						tsk_var_data_fmt, 
+			tsk_fmt = self.__createUnpackString(tsk_const_data_fmt,
+						tsk_var_data_fmt,
 						hdr_data[1])
 			tsk_node = self.__recv(tsk_fmt)
 			self.tsk.append(tsk_node)
@@ -49,7 +49,7 @@ class reciever:
 			intr_node = self.__recv(intr_fmt)
 			self.intr.append(intr_node)
 			i = i + 1
-		
+
 	def __recv(self, fmt):
 		data = self.__sock.recv(256)
 		r = struct.pack('I', len(data))
@@ -232,7 +232,7 @@ class association:
 		print "=============NOW REVERSING==========="
 		i.intr_reverse()
 		i.print_intr_list()
-		
+
 		return i
 
 """
