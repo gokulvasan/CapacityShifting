@@ -6,19 +6,13 @@ from ss_conf_table import *
 
 
 def main():
-
+	
 	remote = reciever("/tmp/ss_parser")
-
+		
 	configuration = Configuration()
 
-	if remote == None:
-		#todo: this number should be generated randomly
-		table = gen_slotshift_table(1, 10, 10, 10, .10)
-		remote = local_table(table[0], table[1],
-				table[2], table[3])
-	else:
-		remote.recieve_table()
-
+	remote.recieve_table()
+	
 	associate = association(remote)
 
 	interval = associate.create_def_intr_list(associate)

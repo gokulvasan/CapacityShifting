@@ -7,12 +7,6 @@ from interval import *
 from simso.configuration import Configuration
 
 server_addr = "/tmp/ss_parser"
-class local_table:
-	def __init__(self, tsk_cnt, tsk_lst, intr_cnt, intr_lst):
-		self.intr_cnt = intr_cnt
-		self.tsk_cnt = tsk_cnt
-		self.tsk = tsk_lst
-		self.intr = intr_lst
 
 class reciever:
 	def __init__(self, serv_addr):
@@ -21,7 +15,7 @@ class reciever:
 			self.__sock.connect(serv_addr)
 		except socket.error, msg:
 			print >>sys.stderr, msg
-			return None 
+			sys.exit(1) 
 		self.intr_cnt = 0
 		self.tsk_cnt = 0
 		self.tsk = []
