@@ -90,9 +90,10 @@ def gen_slotshifting_intervals(job_set, tsk_lst):
 			break
 		intr_lst.append(intr)
 		intr_id += 1
-	print "intr", intr_lst	
 	__correct_intr(intr_lst)
+	print "Before Actual correction", intr_lst
 	__calculate_sc(intr_lst)	
+	print "intr", intr_lst	
 	return intr_lst
 
 def gen_jobs(task, hp, i, job_lst):
