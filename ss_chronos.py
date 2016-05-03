@@ -24,7 +24,7 @@ class time_progress(object):
 class time_progress_discrete(time_progress):
 	
 	def __init__(self, time):
-		time_progress.__init__(self, time)	
+		time_progress.__init__(self, time)
 		self.slot_count = -1
 		self.slot_boundary = 1
 
@@ -42,9 +42,10 @@ class time_progress_discrete(time_progress):
 		self.slot_boundary = 0
 	def set_decn(self):
 		self.slot_boundary = 1
-	
+
 	def update_curr_time(self):
 		self.slot_count += 1
+		print " >>>>TIME: ", self.slot_count * self.time
 	@property
 	def curr_time(self):
 		return self.slot_count
@@ -57,7 +58,7 @@ class chronos(Timer):
 		super(chronos, self).__init__( self.sim, chronos.decision,
 					(self, ), self.time.nxt_decn,
 					in_ms=False, one_shot=True, cpu=self.cpu)
-		self.start()
+		self.decision()
 
 	def decision(self, cpu=None):
 		if cpu is None:
@@ -66,6 +67,7 @@ class chronos(Timer):
 		self.time.set_decn()
 		self.delay = self.time.nxt_decn
 		print "Timer Activation : nxt{} curr{}".format(self.delay, self.get_curr_time)
+		print ">>>>SIM:",self.sim.now_ms()
 		self.start()
 		proc_id.resched()
 

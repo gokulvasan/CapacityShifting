@@ -9,8 +9,8 @@ class SlotShifting(Scheduler):
 		print " IN SCHEDULER"
 		self.interval.print_def_interval()
 		self.state = state()
-		quantum = self.sim.cycles_per_ms * 5 
-		self.time  = chronos(self.sim,  self.processors[0], time_progress_discrete(quantum))
+		self.quantum = self.sim.cycles_per_ms * 5
+		self.start = 0 
 
 	def on_activate(self, job):
 		""""
@@ -20,16 +20,22 @@ class SlotShifting(Scheduler):
 			4. else to ready_list
 			5. iterate job's list
 		"""
+		if self.start == 0:
+			self.start = 1
+			self.time  = chronos(self.sim,  
+						self.processors[0],
+						 time_progress_discrete(self.quantum))
+
 		#print "job got activated {}".format(job.name)
 		if job.task.data.set_current_job(job.task._job_count) > 0:
-			#print "Active job in list"
+			print ">>>>>>>>>>>>>>>Activate job in list", job.name
 			if self.state.add_job(job) < 0:
 				print "Adding job Failed"
 		else:
 			print "job cannot be added as certainity ended"
 
 	def on_terminated(self, job):
-		#print "job terminated {}".format(job.name)
+		print "::::::::::::job terminated {} c: {}".format(job.name, job.computation_time)
 		self.state.rmv_job(job)
 
 	def schedule(self, cpu):
@@ -40,7 +46,7 @@ class SlotShifting(Scheduler):
 		"""
 		if self.time.in_sched == 0:
 			return None
-
+		print ">>>>>SCHED "
 		while  self.state.transit_unconcluded_tsk(self.interval.aperiodic_test):
 			print "Acceptance test"
 
