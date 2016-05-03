@@ -20,8 +20,8 @@ class reciever:
 		try:
 			self.__sock.connect(serv_addr)
 		except socket.error, msg:
-			print >>sys.stderr, msg
 			return None 
+			print >>sys.stderr, msg
 		self.intr_cnt = 0
 		self.tsk_cnt = 0
 		self.tsk = []
@@ -92,7 +92,7 @@ class association:
 	@staticmethod
 	def create_tsk(self, intr_list, conf):
 		if self.tsk_idx >= self.rcvr.tsk_cnt:
-			print "task count: {}".format(self.tsk_idx)
+			#print "task count: {}".format(self.tsk_idx)
 			return None
 		tsk = self.rcvr.tsk[self.tsk_idx]
 		self.tsk_idx += 1
@@ -105,7 +105,7 @@ class association:
 		tskintrcnt = tsk[5]
 		print " ====== TASK id{} est{} wcet{} dl{} prd{} =====".format(tskid, tskest, tskwcet, tskdl, tskperiod)
 		tsk_intr_asco = task_intr_association()
-		i = self.__task_intr_asco(intr_list, tsk_intr_asco, 
+		i = self.__task_intr_asco(intr_list, tsk_intr_asco,
 						tskintrcnt, tsk[6:])
 		if i != 0:
 			return -1
@@ -121,11 +121,15 @@ class association:
 	def __get_intrfrm_id(self, intr, intr_id):
 		intr_list = intr.intr_list
 		i  = intr_list.go_nxt(None)
-		while i != None:
+		curr_cnt = 0
+		intr_cnt = intr.get_intr_count()
+		while curr_cnt < intr_cnt:
 			data = intr_list.get_data(i)
+			#print "curr intr {} Expected {}".format( data.id, intr_id)
 			if data.id == intr_id:
 				return i
 			i = intr_list.go_nxt(i)
+			curr_cnt += 1
 		print "Error: No interval with {} found".format(intr_id)
 		return None
 
@@ -155,58 +159,70 @@ class association:
 
 	def ___create_relation(self, interval, intr_count, lent_node):
 		i = 0
-		while (i + intr_count) < interval.intr_count:
+		while (i + intr_count) <= interval.intr_count:
 			node = interval.goto_nxt_interval(1)
 			data = node.get_data()
 			i += 1
-			print "==========intr id {}".format(data.id)
+			#print "==========intr id {}".format(data.id)
 			if data.sc >= 0:
 				break
 			else:
 				lent_till = node
+
+		if (i + intr_count) >= interval.intr_count:
+			data = lent_till.get_data()
+		else:
+			data = interval.goto_prev_interval(None)
+
 		while 1:
+			data.set_lent_till(lent_till)
+			d = data.lent_till
+			#dt = d.get_data() 
+			#print "lent_till {}".format(dt.id)
+			data.set_lender(lent_node)
+			if data.sc >= 0:
+				break
 			data = interval.goto_prev_interval(None)
 			if data == None:
 				print "moved to head"
 				return
-			data.set_lent_till(lent_till)
-			d = data.lent_till
-			dt = d.get_data() 
-			print "lent_till {}".format(dt.id)
-			data.set_lender(lent_node)
-			if data.sc >= 0:
-				break
 		interval.set_iterator(lent_till)
 		return i
 
 	def __create_interval_relation(self, interval):
 		i = 0
 		interval.reset_iterator()
+		print "INTR COUNT: ", interval.intr_count
 		while i < interval.intr_count:
 			node = interval.goto_nxt_interval(1)
 			data = node.get_data()
 			i += 1
-			if i >= interval.intr_count:
-				break
+			print "curr intr iteration:", data.id, i
+			#if i >= interval.intr_count:
+			#	break
 			if data.sc < 0:
-				print "Error: relation window creation"
-				return
+				print "Error: relation window creation", data.id
+				return -1
  
 			node1 = interval.goto_nxt_interval(1)
 			if node1 == None:
-				return
+				print " Next Node is empty"
+				return 0
 			data1 = node1.get_data()
+			print "NODE 1: ", data1.id
 			if data1.sc < 0:
 				#interval.set_iterator(node1)
 				node1 = interval.goto_prev_interval(1)
 				if node1 == None:
-					return
+					return 0
 				i += self.___create_relation(
 					interval, i, node)
-				print " SC < 0"
+				print " RELATION WINDOW CREATED"
 			else:
-				i += 1
+				node1 = interval.goto_prev_interval(1)
 		interval.reset_iterator()
+		return 0
+
 	@staticmethod
 	def create_relation_window(self, interval):
 		"""
@@ -216,7 +232,8 @@ class association:
 			3. complexity: n^2 + R, but considered offline phase
 		"""
 		self.__create_deferred_intr_list(self, interval)
-		self.__create_interval_relation(interval)
+		if self.__create_interval_relation(interval) < 0:
+			exit(1)
 		# here check for the correctness
 		print "============printing deferred interval============="
 		interval.print_def_interval()
@@ -235,8 +252,8 @@ class association:
 			i.new_intr_append(intr[0],intr[1],intr[2],intr[3])
 			self.intr_idx += 1
 		i.print_intr_list()
-		print "=============NOW REVERSING==========="
-		i.intr_reverse()
+		#print "=============NOW REVERSING==========="
+		#i.intr_reverse()
 		i.print_intr_list()
 
 		return i
