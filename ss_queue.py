@@ -11,14 +11,14 @@ class sslist(object):
 		else:
 			print "data is not in list"
 		return 0
-	@property
+	
 	def data(self):
 		pass
 
 class guaranteed_list(sslist):
 	def __init__(self):
 		super(guaranteed_list, self).__init__()
-	@property
+	
 	def data(self):
 		if self.q:
 			job = min(self.q,
@@ -30,7 +30,7 @@ class guaranteed_list(sslist):
 class not_guaranteed_list(sslist):
 	def __init__(self):
 		super(not_guaranteed_list, self).__init__()
-	@property
+	
 	def data(self):
 		if self.q:
 			job = self.q.pop(0)
@@ -40,7 +40,7 @@ class not_guaranteed_list(sslist):
 class unconcluded_list(sslist):
 	def __init__(self):
 		super(unconcluded_list, self).__init__()
-	@property
+	
 	def data(self):
 		if self.q:
 			# ERROR: here it should dequeue
@@ -57,7 +57,7 @@ class curr_list():
 			return -1
 		self.curr_job = data
 		return 0
-	@property
+
 	def data(self):
 		return self.curr_job
 

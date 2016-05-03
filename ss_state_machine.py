@@ -114,7 +114,7 @@ class state:
 	def __change_state(self, job, nxt_state):
 		ret = -1
 		tsk_data = job.task.data
-		#print "CURR STATE{} NXT STATE {}".format(tsk_data.curr_state, nxt_state)
+		print "CURR STATE{} NXT STATE {}".format(tsk_data.curr_state, nxt_state)
 		if self.__check_transition(tsk_data.curr_state, nxt_state):
 			if tsk_data.curr_state >= 0:
 				if self.__st[tsk_data.curr_state].exit(job) < 0:
@@ -126,7 +126,7 @@ class state:
 	def rmv_job(self, job):
 		data = job.data
 		data.curr_state = tsk_state.exit.value 
-		curr_job = self.__st[tsk_state.running.value].queue.data
+		curr_job = self.__st[tsk_state.running.value].queue.data()
 		if curr_job == job:
 			#print " removing current job"
 			self.__st[tsk_state.running.value].exit(job)
@@ -154,7 +154,7 @@ class state:
 		4. return count on success
 		"""
 		queue = self.__st[tsk_state.unconcluded.value].queue
-		job = queue.data
+		job = queue.data()
 		if job:
 			tsk = job.task
 			state = transition(tsk)
@@ -168,9 +168,9 @@ class state:
 		3. if not check on !guarantee
 		4. move the tsk to curr_tsk state.
 		"""
-		prev_job = self.__st[tsk_state.running.value].queue.data 
+		prev_job = self.__st[tsk_state.running.value].queue.data() 
 		if prev_job:
-			#print "prev job {}".format(prev_job.name)
+			print "prev job {}->{}".format(prev_job.name, prev_job.computation_time)
 			prev_tsk_type = prev_job.task.data.tsk_type
 			if (tsk_type.periodic.value == prev_tsk_type or
 			tsk_type.firm_aperiodic_g.value == prev_tsk_type):
@@ -181,13 +181,15 @@ class state:
 					 tsk_state.not_guarantee.value)
 			else:
 				return -1
+		else :
+			print "PREV JOB IS NONE"
 
-		job = self.__st[tsk_state.guarantee.value].queue.data
+		job = self.__st[tsk_state.guarantee.value].queue.data()
 		if None == job:
-			job = self.__st[tsk_state.not_guarantee.value].queue.data
+			job = self.__st[tsk_state.not_guarantee.value].queue.data()
 		if None != job:
 			self.__change_state(job, tsk_state.running.value)
-			#print " Selected job {}".format(job.name)
+			print " Selected job {}".format(job.name)
 		return job
 
 """
