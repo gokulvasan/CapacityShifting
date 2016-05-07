@@ -134,17 +134,19 @@ def gen_jobs(task, hp, i, job_lst):
 	tsk_job = []
 	job_cnt = hp/task[2]
 	jid  = 1
-	print job_cnt
+	print "JOB COUNT:", job_cnt
 	while jid <= job_cnt:
 		# j_id = jid
 		if jid > 1:
 			c = task[0]
-			d = task[1] * jid
+			d = nxt_est + task[1] #* jid
 			est = nxt_est #task[2] * jid
+			#print "JOB: ", jid, c, d, est
 		else:
 			c = task[0]
 			d = task[1]
 			est = 0
+			#print "JOB: ", jid, c, d, est
 		nxt_est = task[2]*jid
 		tid = i
 		tsk_job.append([tid, jid, c, d, est])
@@ -160,6 +162,17 @@ def gen_jobs(task, hp, i, job_lst):
 	tsk.append(task[2]) #4: period
 	tsk.append(0) #5:intr_cnt
 	return tsk
+def check_utilisation(task_len, task_set):
+	i = 0;
+	U = 0;
+	while i < task_len:
+		c = task_set[i][0]
+		t = task_set[i][1]
+		U += float(c)/float(t)
+		i += 1
+		#print"c:{} p:{} U:{}".format(c,t,U)
+	print "U:", U
+	return U
 
 def gen_slotshift_table(nsets, compute, deadline, period, target_util):
 	"""
@@ -175,12 +188,16 @@ def gen_slotshift_table(nsets, compute, deadline, period, target_util):
 	tsks_lst = []
 	#tsk_set = gen_ripoll(nsets, compute, deadline, period, target_util)
 	# c, d, p
-	tsk_set = [[(3,4,10), (2,5,6), (4,12,12)]]
+	tsk_set = [[(3,4,4), (1,7,7), (3,30,30)]]
 	#print "task_set : {}".format(tsk_set)
-	hp = 12 # get_hyperperiod(tsk_set[0])
+	hp = get_hyperperiod(tsk_set[0])
 	print "hyper period {}".format(hp)
-
 	tsk_cnt = len(tsk_set[0])
+	print "task_Count {} task{}".format(tsk_cnt, tsk_set[0])
+	u = check_utilisation(tsk_cnt, tsk_set[0])
+	if u > 1:
+		print "Error: Utilsation is greater than 1 ==>",u
+		return None
 	while i < tsk_cnt:
 		tsk = gen_jobs(tsk_set[0][i], hp, i, job_lst)
 		tsks_lst.append(tsk)
