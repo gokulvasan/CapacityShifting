@@ -159,16 +159,17 @@ class association:
 
 	def ___create_relation(self, interval, intr_count, lent_node):
 		i = 0
-		while (i + intr_count) <= interval.intr_count:
+		while (i + intr_count) < interval.intr_count:
 			node = interval.goto_nxt_interval(1)
 			data = node.get_data()
-			i += 1
 			#print "==========intr id {}".format(data.id)
 			if data.sc >= 0:
+				print "found a intr >= 0"
 				break
 			else:
 				lent_till = node
-
+				i += 1
+		print "=======================LENDER:{} LENT TILL:{} count{}".format(lent_node.get_data().id, lent_till.get_data().id, i+intr_count), i
 		if (i + intr_count) >= interval.intr_count:
 			data = lent_till.get_data()
 		else:
@@ -197,7 +198,7 @@ class association:
 			node = interval.goto_nxt_interval(1)
 			data = node.get_data()
 			i += 1
-			print "curr intr iteration:", data.id, i
+			#print "curr intr iteration:", data.id, i
 			#if i >= interval.intr_count:
 			#	break
 			if data.sc < 0:
