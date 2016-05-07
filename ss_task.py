@@ -113,7 +113,8 @@ class task_data:
 			return 1
 		else:
 			self.curr_index = self.curr_index + 1
-			#print 'curridx {}'.format(self.curr_index)
+			print 'curridx {}'.format(self.curr_index)
+			print "curr job no:", self.intr_list.get_node(self.curr_index).j_no
 			if self.curr_index >= self.intr_count:
 				return 0
 		return 1
