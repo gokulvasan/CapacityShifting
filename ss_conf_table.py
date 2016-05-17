@@ -55,6 +55,7 @@ class reciever:
 			intr_node = self.__recv(intr_fmt)
 			self.intr.append(intr_node)
 			i = i + 1
+		self.intr.reverse()
 
 	def __recv(self, fmt):
 		data = self.__sock.recv(256)
@@ -238,9 +239,10 @@ class association:
 		# here check for the correctness
 		print "============printing deferred interval============="
 		interval.print_def_interval()
-		print "==========setting CURRENT INTR"
+		interval.reset_iterator()
 		curr_intr = interval.goto_nxt_interval(1)
 		interval.set_curr_interval(curr_intr.get_data())
+		print "==========setting CURRENT INTR",interval.curr_interval.id
 		interval.set_iterator(curr_intr)	
 	"""
 	Creates deferred_interval object 
@@ -250,7 +252,7 @@ class association:
 		i = deferred_interval()
 		while self.intr_idx < self.rcvr.intr_cnt:
 			intr = self.rcvr.intr[self.intr_idx]
-			i.new_intr_append(intr[0],intr[1],intr[2],intr[3])
+			i.new_intr_append(intr[0],intr[1]*5,intr[2]*5,intr[3]*5)
 			self.intr_idx += 1
 		i.print_intr_list()
 		#print "=============NOW REVERSING==========="
@@ -258,7 +260,10 @@ class association:
 		i.print_intr_list()
 
 		return i
-
+	def get_running_time(self, intr):
+		last_intr = intr.get_last_intr()
+		return ((last_intr.end + 1) * 5)
+		 
 """
 class client:
 	def __init__(self):

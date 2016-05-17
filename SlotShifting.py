@@ -7,9 +7,9 @@ class SlotShifting(Scheduler):
 		self.interval = self.data
 		self.curr_job = None
 		print " IN SCHEDULER"
-		self.interval.print_def_interval()
+		#self.interval.print_def_interval()
 		self.state = state()
-		self.quantum = self.sim.cycles_per_ms * 5
+		self.quantum = 5
 		self.start = 0 
 
 	def on_activate(self, job):
@@ -23,8 +23,9 @@ class SlotShifting(Scheduler):
 		if self.start == 0:
 			self.start = 1
 			self.time  = chronos(self.sim,  
-						self.processors[0],
-						 time_progress_discrete(self.quantum))
+				self.processors[0],
+				time_progress_continous(self.interval.nxt_decn))
+				#time_progress_discrete(self.quantum))
 
 		#print "job got activated {}".format(job.name)
 		if job.task.data.set_current_job(job.task._job_count) > 0:
@@ -33,10 +34,11 @@ class SlotShifting(Scheduler):
 				print "Adding job Failed"
 		else:
 			print "job cannot be added as certainity ended"
-
+		self.processors[0].resched()
 	def on_terminated(self, job):
 		print "::::::::::::job terminated {} c: {}".format(job.name, job.computation_time)
 		self.state.rmv_job(job)
+		self.processors[0].resched()
 
 	def schedule(self, cpu):
 		"""
@@ -45,19 +47,20 @@ class SlotShifting(Scheduler):
 			3. run EDF on ready_list
 		"""
 		if self.time.in_sched == 0:
-			return None
-		print ">>>>>SCHED "
+			return self.curr_job
+		print ">>>>>SCHED ", self.sim.now_ms()
+		if self.curr_job:
+			print("prev selected job : %s %.3f ms" % (self.curr_job.name, self.curr_job.computation_time))
+			tsk = self.curr_job.task
+		else:
+			print "prev selected job is None"
+			tsk = None
+		#self.time.get_curr_time
+		self.interval.update_intr(self.sim.now_ms(), tsk)
+
 		while  self.state.transit_unconcluded_tsk(self.interval.aperiodic_test):
 			print "Acceptance test"
 
 		self.curr_job = self.state.selection_function()
-		if self.curr_job:
-			print("selected job : %s %.3f ms" % (self.curr_job.name, self.curr_job.computation_time))
-			tsk = self.curr_job.task
-		else:
-			print "selected job is None"
-			tsk = None
-
-		self.interval.update_intr(self.time.get_curr_time, tsk)
 
 		return (self.curr_job, self.processors[0])		

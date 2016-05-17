@@ -114,7 +114,7 @@ class state:
 	def __change_state(self, job, nxt_state):
 		ret = -1
 		tsk_data = job.task.data
-		print "CURR STATE{} NXT STATE {}".format(tsk_data.curr_state, nxt_state)
+		#print "CURR STATE{} NXT STATE {}".format(tsk_data.curr_state, nxt_state)
 		if self.__check_transition(tsk_data.curr_state, nxt_state):
 			if tsk_data.curr_state >= 0:
 				if self.__st[tsk_data.curr_state].exit(job) < 0:
@@ -138,7 +138,7 @@ class state:
 
 	def add_job(self, job):
 		tsk_data = job.task.data
-		print "tsk type {}".format(job.data.tsk_type)
+		#print "tsk type {}".format(job.data.tsk_type)
 		nxt_state =self.__change_state(job,
 					 tsk_state.just_arrived.value)
 		if nxt_state >= 0:
@@ -170,7 +170,7 @@ class state:
 		"""
 		prev_job = self.__st[tsk_state.running.value].queue.data() 
 		if prev_job:
-			print "prev job {}->{}".format(prev_job.name, prev_job.computation_time)
+			#print "prev job {}->{}".format(prev_job.name, prev_job.computation_time)
 			prev_tsk_type = prev_job.task.data.tsk_type
 			if (tsk_type.periodic.value == prev_tsk_type or
 			tsk_type.firm_aperiodic_g.value == prev_tsk_type):
@@ -189,7 +189,7 @@ class state:
 			job = self.__st[tsk_state.not_guarantee.value].queue.data()
 		if None != job:
 			self.__change_state(job, tsk_state.running.value)
-			print " Selected job {}".format(job.name)
+			#print " Selected job {}".format(job.name)
 		return job
 
 """
