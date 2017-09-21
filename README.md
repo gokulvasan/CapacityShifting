@@ -54,3 +54,7 @@ SIMSO Modification:
 * slot shifting needs a seperate data structure called interval which needs to be associated with job of the task to make this happen simso itself needs modification to adapt to different DS.
 * In this implementation I tried to make this modification as generic as possible so that the modification
 can be used for other schedulers as well. 
+
+REPORT :
+--------
+[Capacity Shifting ](https://github.com/gokulvasan/CapacityShifting/blob/master/capacityshifting_finalReport.pdf)
