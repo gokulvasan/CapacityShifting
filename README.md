@@ -1,23 +1,56 @@
-optimizing slot shift using SIMSO simulator
+OPTIMIZING slot shift using SIMSO simulator[ Capacity Shifting ]
+=================================================================
 
-SLOT SHIFTING : 
-Static scheduling has been shown to be appropriate for a variety of hard real-time systems, mainly due to the verifiable timing behavior of the system and the complex task models supported.
-Its application is, however, impeded in systems with changing operational modes and critical activities, that arrive infrequently with unknown occurrence times. This thesis presents an approach to overcome these shortcomings. It addresses static scheduling, illustrated by an algorithm serving as case study, and provides concepts to extend the scope of statically scheduled systems to deal with mode changes properly and to provide for efficient handling of dynamic activities.
+Optimisation:
+-------------
+* Desynchronize the slots and let the scheduler exhibit natural EDF behaviour.
+* Reduce time complexity of Guarantee Algorithm from O(N^2) to O(N).
 
-Mode changes are performed by switching from one periodically executing static schedule to another via a special schedule to prepare for the change. As all involved schedules are constructed statically, all actions executing the mode change do so deterministically: Given the current mode, time, and mode change request, the exact executions during the mode change and their completion time are known before run-time.
+SLOT SHIFTING :
+----------------
 
-Dynamic activities are incorporated in to static schedules by making use of the unused resources and leeways in the schedule. We present mechanisms to effectively maintain information about the amount of dynamic activity that can be accommodated without impairing the feasible execution of statically scheduled tasks. On top of this service, aperiodic tasks can be handled in a very simple way. We furthermore present an on-line guarantee algorithm.
+  * What  is slotshifting?
+    * One among the few scheduling algorithms that guarantees aperiodics on admittance.
+    * [Algorithmic View of slot shifting]( https://github.com/gokulvasan/Slot-shifting-in-LITMUS-RT-Kernel-2.6/blob/master/documentations/SlotShifting.pdf )
+    * [original paper](https://www.slideshare.net/slideshow/embed_code/key/PJt8vhtGcHvKQ)
 
-A combined approach integrates both methods.
+CAPACITY SHIFTING:
+------------------
+* **Goal:** Making slot shifting scheduling  algorithm 60% efficient  by addressing the following problems:
 
-CAPACITY SHIFTING: 
-Slot shifting tries to make decision on a defined time frame called slots, This approach is basically used for convergence on schedulibity decision
-in a distributed environment, but This is a overhead on a system.
+* **Problem1:** Updating Spare Capacity
+  * The function update-sc is applied for every slot.
+  * The problem arises when job that does not belong to the current interval is executing in current interval and spare capacity of the job’s Interval is negative then we traverse Backwards through all the consecutive negative intervals and increment the spare capacity of the intervals till either we reach positive interval or current interval, which we presume is the lender to these backward consecutive intervals.
+  * The function update-sc becomes an consistent Overhead when
+  * current executing job’s Interval is not Current interval and job’s interval’s spare capacity is a BIG negative number, which intuitively means the borrow from the lender interval is also big.
+  * Interval to which task belongs is far away from lender,i.e. there are many intervals in between the lender and job’s interval.
+  * overhead further complicates when current job is the only task being selected for the next consecutive slots of Current Interval, which might be a normal scenario in EDF. 
 
+  * **Solution:** Deferred update.
+
+* **Problem2:** Slots
+  * Notion of slots might be a good approach in distributed systems but the system that has centralised clock trigger, slot adds
+following overhead.
+  *  Increases the number of time scheduling decision needs to be made.
+  * Might make aperiodic miss deadline.
+  
+  * **Solution:** Desynchronization.
+
+* **Problem3:**  Acceptance and Guarantee Algorithm
+  * Additional space of reference between job and interval is needed.
+  * Increases runtime complexity in the calculation of online spare capacity.
+  * Worst and average case time complexity is  O(N.M), where 
+       * N is the number of intervals.
+       * M is the job per interval.
+       * if(M == N), the time complexity is O(N^2).
+
+  * **Solution:** New Algorithm that runs O(N).
+
+**Conclusion:**
 Capacity Shifting is a methodical approach to remove slots but still provide the flexibility and guarantee provided by slot shifting.
 
-SIMSO Modification: 
-slot shifting needs a seperate data structure called interval which needs to be associated with job of the task.
-To make this happen simso itself needs modification to adapt to different DS.
-In this implementation I will try to make this modification as generic as possible so that the modification
+SIMSO Modification:
+-------------------
+* slot shifting needs a seperate data structure called interval which needs to be associated with job of the task to make this happen simso itself needs modification to adapt to different DS.
+* In this implementation I tried to make this modification as generic as possible so that the modification
 can be used for other schedulers as well. 
