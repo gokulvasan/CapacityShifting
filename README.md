@@ -1,5 +1,5 @@
-OPTIMIZING slot shift using SIMSO simulator[ Capacity Shifting ]
-=================================================================
+OPTIMIZING slot shift using SIMSO simulator [Capacity Shifting]
+===============================================================
 
 Optimisation:
 -------------
