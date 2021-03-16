@@ -1,5 +1,6 @@
 Optimizing Slot Shifting Using SIMSO Simulator [Capacity Shifting]
-===============================================================
+==================================================================
+Author: Gokul Vasdan
 
 Optimisation:
 -------------
